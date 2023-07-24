@@ -1,14 +1,26 @@
+const dotenv = require('dotenv');
 const mongoose = require('mongoose');
 const express = require('express');
 const app = express();
 
-//Connection String
-const DB = 'mongodb+srv://haris:haris7857@cluster0.ln0xcrm.mongodb.net/mernstack?retryWrites=true&w=majority';
 
-//Connected TO Database
-mongoose.connect(DB, { useUnifiedTopology : true, useNewUrlParser : true , }).then(() => {
-    console.log("Connection Succeed");
- }).catch((e) => console.log("Connection Failed")) 
+//DOTENV
+dotenv.config({path:'./config.env'});
+
+//UserSchema
+const User = require('./model/userSchema'); 
+
+//Connection String
+require('./db/conn');
+
+app.use(express.json());
+
+//router to make route easily 
+app.use(require('./router/auth'));
+
+
+//PORT
+const PORT = process.env.PORT;
 
 //Middleware
 const middleware = (req,res,next) =>{
@@ -17,7 +29,7 @@ const middleware = (req,res,next) =>{
 }
 
 app.get('/', (req,res) => {
-    res.send('Hello World');
+    res.send('Hello World app');
 });
 
 app.get('/about',middleware,(req,res) => {
@@ -37,6 +49,6 @@ app.get('/signup',(req,res) => {
 });
 
 //Hosting 
-app.listen(3000, () =>{
-    console.log('server is running at no 3000')
+app.listen(PORT, () =>{
+    console.log(`SERVER IS RUNNING AT NO.${PORT}`)
 });
