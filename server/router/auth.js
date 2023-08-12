@@ -12,6 +12,7 @@ require('../db/conn');
 const User = require('../model/userSchema');
 
 //Javascript promising
+
 // router.post('/register', async  (req,res) => {
 
 //      const  {name,email,phone,work,password} = req.body;
