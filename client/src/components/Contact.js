@@ -1,21 +1,45 @@
-import React, { useState } from 'react';
+/* eslint-disable no-unused-vars */
+import React, { useState,useEffect } from 'react';
 import { Card, CardContent, Typography, TextField, Button, Container, Grid, Paper, CircularProgress } from '@mui/material';
 import PhoneIcon from '@mui/icons-material/Phone';
 import EmailIcon from '@mui/icons-material/Email';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
-import SendIcon from '@mui/icons-material/Send'; // Import the SendIcon from Material-UI
+import SendIcon from '@mui/icons-material/Send';
+import {useNavigate} from 'react-router-dom';
 
 const Contact = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSendClick = () => {
     setIsLoading(true);
-    // Simulate an API call or processing time
     setTimeout(() => {
       setIsLoading(false);
     }, 2000);
   };
-
+  const [userData,setUserData] = useState('');
+  const UserContact = async ()=>{
+    try {
+      const res = await fetch('/getdata',{
+        method:"GET",
+        headers: {
+          "Content-Type":"application/json"
+        }
+      });
+      const data = await res.json();
+      setUserData(data);
+      if(res.status !== 200){
+        const error = new Error(res.error);
+        throw error;
+      }
+      
+    } catch (error) {
+      console.log(error)
+    }
+  }
+  useEffect(() => {
+    UserContact();
+  })
+  
   return (
     <div className="contact-root">
       <Container maxWidth="lg" className="contact-container">
@@ -30,7 +54,7 @@ const Contact = () => {
                       <Typography variant="subtitle1" className="card-heading">
                         Phone Number
                       </Typography>
-                      <Typography className="card-text">+1234567890</Typography>
+                      <Typography className="card-text">{userData.phone}</Typography>
                     </CardContent>
                   </Card>
                 </Paper>
@@ -43,7 +67,7 @@ const Contact = () => {
                       <Typography variant="subtitle1" className="card-heading">
                         Email
                       </Typography>
-                      <Typography className="card-text">contact@example.com</Typography>
+                      <Typography className="card-text">{userData.email}</Typography>
                     </CardContent>
                   </Card>
                 </Paper>

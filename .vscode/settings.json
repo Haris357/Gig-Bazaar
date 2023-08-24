@@ -1,8 +1,36 @@
 {
     "cSpell.words": [
+        "Appbar",
+        "appllication",
         "boxin",
+        "darkgreen",
         "describedby",
+        "Deverse",
+        "DEVERSEUSER",
+        "devjobpostingschema",
+        "devproposals",
+        "DEVUSER",
+        "devusers",
+        "firstname",
+        "getdata",
+        "hidemodal",
+        "hiretalent",
+        "hoverable",
+        "jobp",
+        "jobposting",
+        "jobpostings",
+        "jwtoken",
+        "lastname",
         "lightgreen",
-        "Upbg"
+        "setjobp",
+        "signin",
+        "tabpanel",
+        "toastify",
+        "Upbg",
+        "userid",
+        "usersignin",
+        "usersignout",
+        "usersignup",
+        "verifytoken"
     ]
 }

@@ -3,8 +3,16 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
 
-const userSchema = new mongoose.Schema({
-    name: {
+const devusersSchema = new mongoose.Schema({
+    designation: {
+        type:String,
+        required:true
+    },
+    firstname: {
+        type:String,
+        required:true
+    },
+    lastname: {
         type:String,
         required:true
     },
@@ -12,15 +20,11 @@ const userSchema = new mongoose.Schema({
         type:String,
         required:true
     },
-    phone: {
-        type:Number,
-        required:true
-    },
-    work: {
+    password: {
         type:String,
         required:true
     },
-    password: {
+    location: {
         type:String,
         required:true
     },
@@ -36,14 +40,14 @@ const userSchema = new mongoose.Schema({
 })
 
 //Hashing Password
-userSchema.pre('save', async function(next){
+devusersSchema.pre('save', async function(next){
     if (this.isModified('password')){
         this.password = await bcrypt.hash(this.password,12);
     }
     next();
 });
 //JWT Token
-userSchema.methods.generateAuthToken = async function(){
+devusersSchema.methods.generateAuthToken = async function(){
     try{
         let token = jwt.sign({_id:this._id},process.env.SECRET_KEY);
         this.tokens = this.tokens.concat({token:token});
@@ -55,6 +59,6 @@ userSchema.methods.generateAuthToken = async function(){
     }
 }
 
-const User = mongoose.model('USER',userSchema);
+const DeverseUser = mongoose.model('DEVERSEUSER',devusersSchema);
 
-module.exports = User;
+module.exports = DeverseUser;

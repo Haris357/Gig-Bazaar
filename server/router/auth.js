@@ -2,19 +2,22 @@ const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const authenticate = require('../middleware/authenticate')
 
 router.get('/', (req,res) => {
      res.send('Hello World router');
 });
+
 //connection
 require('../db/conn');
+
 //model
-const User = require('../model/userSchema');
+const DevUser = require("../model/devusersSchema");
+const DevJob = require('../model/devjobpostingschema');
 
 //Javascript promising
 
 // router.post('/register', async  (req,res) => {
-
 //      const  {name,email,phone,work,password} = req.body;
 //      if( !name || !email || !phone || !work || !password ){
 //           return res.status(422).json({error: "Parameter Missing"});
@@ -25,29 +28,27 @@ const User = require('../model/userSchema');
 //                return res.status(422).json({error: "Email Already Exist"});
 //           }
 //           const user = new User({name,email,phone,work,password});
-
 //           user.save().then(()=>{
 //                res.status(201).json({ message: "User Registered Successfully" });
 //           }).catch((err)=> res.status(500).json({error:"Registration Failed"}))
 //      }).catch((err)=>{console.log(err);})
-
 //  });
-
 //Async Await
-
-//Register
-router.post('/register', async  (req,res) => {
-     const  {name,email,phone,work,password} = req.body;
-     if( !name || !email || !phone || !work || !password ){
+ //signup
+ 
+ //Registration
+ router.post('/signup', async  (req,res) => {
+     const  {designation,firstname,lastname,email,password,location} = req.body;
+     if( !designation || !firstname || !lastname || !email || !password || !location ){
           return res.status(422).json({error: "Please Add Missing Fields"});
      }
      try{
-          const userExist = await User.findOne({email:email});
+          const userExist = await DevUser.findOne({email:email});
 
           if(userExist){
                return res.status(422).json({error: "Email Already Exist"});
           }
-          const user = new User({name,email,phone,work,password});
+          const user = new DevUser({designation,firstname,lastname,email,password,location});
           
           await user.save();
 
@@ -58,7 +59,7 @@ router.post('/register', async  (req,res) => {
      }
  });
 
-//Login
+ //Login
  router.post('/signIn', async (req,res)=>{
      try{
           const {email,password} = req.body;
@@ -66,7 +67,7 @@ router.post('/register', async  (req,res) => {
                return res.status(400).json({error:"Please Provide Credentials"})
           }
 
-          const userLogin = await User.findOne({email:email});
+          const userLogin = await DevUser.findOne({email:email});
           //console.log(userLogin); 
          
           if(userLogin){
@@ -79,7 +80,7 @@ router.post('/register', async  (req,res) => {
                // console.log(token);
 
                //Storing Token in cookie expires in 30 Days
-               res.cookie("token",token,{
+               res.cookie("jwtoken",token,{
                     expires: new Date(Date.now() + 25892000000),
                     httpOnly:true
                });
@@ -101,4 +102,44 @@ router.post('/register', async  (req,res) => {
      }
  })
 
+ //jobposting
+ router.post('/jobposting',async (req,res)=>{
+     const {job,skills,description,createdOn,createdBy} = req.body;
+     
+     if( !job || !skills || !description || !createdOn || !createdBy ) {
+         return res.status(422).json({error: "Please Add Missing Fields"});
+     }
+     try {
+         const jp = new DevJob({job,skills,description,createdOn,createdBy});
+         await jp.save();
+         res.status(201).json({message:"Job Posted"});
+     } catch (error) {
+         console.log(error)
+     }
+ });
+
+ router.get('/jobpostings', async (req, res) => {
+     try {
+       const jobPostings = await DevJob.find();
+       res.status(200).json(jobPostings);
+     } catch (error) {
+       console.error(error);
+       res.status(500).json({ error: 'Internal server error' });
+     }
+   });
+
+ //get about
+     router.get('/about',authenticate,(req,res) => {
+     res.send(req.rootUser);
+});
+//get contact && home
+     router.get('/getdata',authenticate,(req,res)=>{
+          res.send(req.rootUser);
+     });
+//logout
+router.get('/logout', (req, res) => {
+     res.clearCookie('jwtoken', { path: '/' });
+     res.status(200).send('User Logout');
+   });
+   
 module.exports = router;

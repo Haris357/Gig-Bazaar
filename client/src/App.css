@@ -52,9 +52,9 @@
   justify-content: flex-start;
   align-items: flex-start;
   height: 100vh;
-  background-color: #f5f5f5; /* Light gray background color */
-  color: #333; /* Dark text color */
-  padding-top: 20px; /* Add padding to push content down from top */
+  background-color: #f5f5f5;
+  color: #333;
+  padding-top: 20px;
 }
 
 .card-container {
@@ -63,17 +63,17 @@
   width: 80%;
   max-width: 800px;
   margin: 0 auto;
-  gap: 20px; /* Add gap between cards */
+  gap: 20px;
 }
 
 .card {
   flex: 1;
   text-align: center;
-  background-color: #fff; /* White card background */
-  border: 1px solid #ccc; /* Add a light border */
-  padding: 20px; /* Add padding to the card */
-  transition: transform 0.3s, box-shadow 0.3s; /* Smoother transition */
-  cursor: pointer; /* Add cursor pointer on hover */
+  background-color: #fff;
+  border: 1px solid #ccc;
+  padding: 20px;
+  transition: transform 0.3s, box-shadow 0.3s;
+  cursor: pointer;
 }
 
 .card:hover {
@@ -87,15 +87,14 @@
 }
 
 .card-heading {
-  font-weight: 700; /* Bolder font weight */
-  margin-bottom: 0.5rem; /* Add spacing below heading */
+  font-weight: 700;
+  margin-bottom: 0.5rem;
 }
 
 .card-text {
-  font-size: 12px; /* Smaller font size */
+  font-size: 12px;
 }
-/* app.css */
-/* ... existing styles ... */
+
 
 /* app.css */
 .contact-root {
@@ -103,9 +102,9 @@
   justify-content: flex-start;
   align-items: flex-start;
   height: 100vh;
-  background-color: #ffffff; /* Light gray background color */
-  color: #333; /* Dark text color */
-  padding-top: 20px; /* Add padding to push content down from top */
+  background-color: #ffffff;
+  color: #333;
+  padding-top: 20px;
 }
 
 .card-container {
@@ -114,17 +113,17 @@
   width: 80%;
   max-width: 800px;
   margin: 0 auto;
-  gap: 20px; /* Add gap between cards */
+  gap: 20px;
 }
 
 .card {
   flex: 1;
   text-align: center;
-  background-color: #fff; /* White card background */
-  border: 1px solid #ccc; /* Add a light border */
-  padding: 20px; /* Add padding to the card */
-  transition: transform 0.3s, box-shadow 0.3s; /* Smoother transition */
-  cursor: pointer; /* Add cursor pointer on hover */
+  background-color: #fff;
+  border: 1px solid #ccc;
+  padding: 20px;
+  transition: transform 0.3s, box-shadow 0.3s;
+  cursor: pointer;
 }
 
 .card:hover {
@@ -138,14 +137,13 @@
 }
 
 .card-heading {
-  font-weight: 700; /* Bolder font weight */
-  margin-bottom: 0.5rem; /* Add spacing below heading */
+  font-weight: 700;
+  margin-bottom: 0.5rem;
 }
 
 .card-text {
-  font-size: 12px; /* Smaller font size */
+  font-size: 12px;
 }
-/* Assuming you have the 'send-button' and 'loading' classes defined */
 .send-button {
   transition: transform 0.3s ease-in-out;
 }
@@ -155,18 +153,11 @@
 }
 
 .loading {
-  pointer-events: none; /* Disable button interaction while loading */
-  cursor: progress; /* Show loading cursor */
+  pointer-events: none;
+  cursor: progress;
 }
 /* home */
-.home-container {
-  height: 100vh;
-  background: linear-gradient(to right, #50af50 50%, #a1dca1 50%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-}
+
 
 .title {
   position: relative;
@@ -188,16 +179,15 @@
   }
 }
 /* navbar */
-/* Add this CSS to change font color on hover and for active buttons */
 .nav-link button {
-  color: initial; /* Reset button color */
+  color: initial; 
 }
 
 .nav-link:hover button,
 .nav-link.active button {
   color: black;
 }
-/* Add this CSS to create a hover animation for the buttons */
+
 .nav-link:hover button {
   transform: scale(1.05);
 }
@@ -223,3 +213,33 @@
 ::-webkit-scrollbar-thumb:hover {
   background-color: #555;
 }
+.job-list-container {
+  margin-top: 20px; 
+}
+/* MetaMaskComponent.css */
+
+.meta-mask-container {
+  text-align: center;
+  padding: 20px;
+}
+
+.meta-mask-button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+  margin: 10px;
+  border-radius: 5px;
+}
+
+.meta-mask-info {
+  margin-top: 20px;
+}
+
+.status-indicator {
+  color: #4caf50;
+  margin-left: 5px;
+}
+/* Deverse */
+
