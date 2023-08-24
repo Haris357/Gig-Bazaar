@@ -1,6 +1,6 @@
 /* eslint-disable no-use-before-define */
 /* eslint-disable no-unused-vars */
-import React, { useState,useEffect } from 'react';
+import React, { useState,useEffect,useRef } from 'react';
 import Container from '@mui/material/Container';
 import Grid from '@mui/material/Grid';
 import { TextField, TextareaAutosize } from '@mui/material';
@@ -15,6 +15,11 @@ import { Paper, List, ListItem, ListItemText,IconButton } from '@mui/material';
 import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import ThumbDownIcon from '@mui/icons-material/ThumbDown';
 import { formatDistanceToNow } from 'date-fns';
+import InputAdornment from '@mui/material/InputAdornment';
+import SearchIcon from '@mui/icons-material/Search';
+import {Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from '@mui/material';
+import Web3 from 'web3';
+
 
 const JobPosting = () => {
 
@@ -243,7 +248,7 @@ const JobPosting = () => {
   
   const userid = userData.firstname;
   const [jobp,setjobp] = useState({
-    job:"",skills:"",description:"",createdOn:currentDateTime,createdBy:userid
+    job:"",skills:"",description:"",createdOn:currentDateTime,createdBy:userid,title:"",expertise:"",pricing:null
   });
 
   useEffect(() => {
@@ -254,34 +259,44 @@ const JobPosting = () => {
   }, [userData]);
 
   const handleSubmit = async (e) => {
-    debugger
-    console.log(jobp);
+    debugger;
     setLoading(true);
     e.preventDefault();
-    const { job, skills, description, createdOn, createdBy } = jobp;
-    const res = await fetch("/jobposting", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-       job, skills, description, createdOn, createdBy
-      })
-    });
   
-    const data = await res.json();
-    console.log(jobp);
-    if (data.status === 422 || !data) {
-      toast.error('Something went wrong');
-    } else {
-      setJobPostings(prevJobPostings => [...prevJobPostings, {
-        skills, description, createdBy
-      }]);
-      toast.success('Job Posted Successfully');
+    const formData = new FormData();
+    formData.append('file', selectedFile);
+    formData.append('job', jobp.job);
+    formData.append('skills', jobp.skills);
+    formData.append('description', jobp.description);
+    formData.append('createdOn', jobp.createdOn);
+    formData.append('createdBy', jobp.createdBy);
+    formData.append('title', jobp.title);
+    formData.append('expertise', jobp.expertise);
+    formData.append('pricing', jobp.pricing);
+
+  
+    try {
+      const res = await fetch("/jobposting", {
+        method: "POST",
+        body: formData,
+      });
+  
+      const data = await res.json();
+  
+      if (data.error) {
+        toast.error(data.error);
+      } else {
+        setJobPostings([...jobPostings, jobp]);
+        toast.success('Job Posted Successfully');
+      }
+    } catch (error) {
+      console.error('Error posting job:', error);
+      toast.error('Error posting job');
     }
   
     setLoading(false);
   };
+  
   
 
   const [jobPostings, setJobPostings] = useState([]);
@@ -321,130 +336,275 @@ const JobPosting = () => {
     }));
   };
 
+  const handleAutocompleteChange = (_, newValue) => {
+    handleInputs({ target: { name: 'expertise', value: newValue } });
+  };
 
-  const [likeAnimation, setLikeAnimation] = useState(false);
-  const [dislikeAnimation, setDislikeAnimation] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [openModal, setOpenModal] = useState(false);
+  const [selectedJob, setSelectedJob] = useState(null);
+
+  const handleOpenModal = (job) => {
+    setSelectedJob(job);
+    setOpenModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setOpenModal(false);
+  };
+
+  const filteredJobPostings = jobPostings.filter((job) =>
+  job.job && job.job.toLowerCase().includes(searchTerm.toLowerCase())
+);
+
+const [ethValue, setEthValue] = useState('');
+  const [ethToUsdRate, setEthToUsdRate] = useState(null);
+
+  const handleEthChange = (event) => {
+    const input = event.target.value;
+
+    if (/^\d*\.?\d*$/.test(input)) {
+      setEthValue(input);
+    }
+  };
+
+  const fetchEthereumPrice = async () => {
+    try {
+      const web3 = new Web3('https://mainnet.infura.io/v3/YOUR_INFURA_PROJECT_ID');
+      const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd');
+      const data = await response.json();
+      const ethPriceInUSD = data.ethereum.usd;
+      setEthToUsdRate(ethPriceInUSD);
+    } catch (error) {
+      console.error('Error fetching Ethereum price:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchEthereumPrice();
+  }, []);
+
+  const calculateUsdValue = () => {
+    const ethAmount = parseFloat(ethValue);
+    if (!isNaN(ethAmount) && ethToUsdRate !== null) {
+      return (ethAmount * ethToUsdRate).toFixed(2);
+    }
+    return '';
+  };
+  const [selectedFile, setSelectedFile] = useState(null);
+  const fileInputRef = useRef(null);
+
+  const handleFileChange = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      setSelectedFile(file);
+    }
+  };
+  
 
   return (
     <>
     <Grid container spacing={0}>
       {userData.designation === 'Client' &&(
-        <Grid item xs={12}>
+        <Grid item xs={11}>
         <Container maxWidth='lg' className='p-3'>
         <div className='shadow-lg p-3  bg bg-white rounded'>
             <div className='row'>
-            <div className='col'>
+              <div className='col'>
                 <Grid container spacing={3}>
-          <Grid item xs={6}>
-            <Autocomplete
-              size='small'
-              options={[
-                "Writing & Content",
-                "Graphic Design & Multimedia",
-                "Programming & Development",
-                "Digital Marketing",
-                "Administrative Support",
-                "Translation & Languages",
-                "Sales & Marketing",
-                "Engineering & Architecture",
-                "Legal Services",
-                "Finance & Accounting",
-                "Data Science & Analytics",
-                "Video & Animation",
-                "Music & Audio",
-                "Consulting & Coaching",
-                "Healthcare & Wellness"
-              ]}
-              renderInput={(params) => <TextField {...params} label="Select Job" />}
-              value={jobp.job || null}
-              onChange={(event, value) => {
-                if (value) {
-                  setjobp((prevJobp) => ({
-                    ...prevJobp,
-                    job: value,
-                    skills: null,
-                  }));
-                }
-              }}
-            />
-          </Grid>
-          <Grid item xs={6}>
-            {jobp.job && (
-              <Autocomplete
-                size='small'
-                options={jobSkills[jobp.job] || []}
-                renderInput={(params) => <TextField {...params} label='Skills' variant='outlined' />}
-                value={jobp.skills || null}
-                onChange={(event, value) => {
-                  setjobp((prevJobp) => ({
-                    ...prevJobp,
-                    skills: value,
-                  }));
-                }}
-                disabled={!jobp.job}
-              />
-            )}
-          </Grid>
-                <Grid item xs={12}>
-                    <TextareaAutosize
-                    placeholder='Description'
-                    style={{
-                        width: '100%',
-                        padding: '0.5rem',
-                        fontSize: '1rem',
-                        borderRadius: '4px',
-                        
-                    }}
-                    value={jobp.description} name='description' onChange={handleInputs}
+                  <Grid item xs={6} >
+                    <TextField variant='outlined' name='title' onChange={handleInputs} value={jobp.title} fullWidth size='small' label='Job Title' />
+                  </Grid>
+                  <Grid item xs={6} >
+                  <Autocomplete
+                    size='small' 
+                    options={[
+                      "Beginner",
+                      "Intermediate",
+                      "Expert"
+                    ]}
+                    renderInput={(params) => <TextField {...params} label="Select Expertise" />}
+                    name="expertise"
+                    value={jobp.expertise || null}
+                    onChange={handleAutocompleteChange}
+                  />
+                  </Grid>
+                  <Grid item xs={6}>
+                    <Autocomplete
+                      size='small'
+                      options={[
+                        "Writing & Content",
+                        "Graphic Design & Multimedia",
+                        "Programming & Development",
+                        "Digital Marketing",
+                        "Administrative Support",
+                        "Translation & Languages",
+                        "Sales & Marketing",
+                        "Engineering & Architecture",
+                        "Legal Services",
+                        "Finance & Accounting",
+                        "Data Science & Analytics",
+                        "Video & Animation",
+                        "Music & Audio",
+                        "Consulting & Coaching",
+                        "Healthcare & Wellness"
+                      ]}
+                      renderInput={(params) => <TextField {...params} label="Select Job" />}
+                      value={jobp.job || null}
+                      onChange={(event, value) => {
+                        if (value) {
+                          setjobp((prevJobp) => ({
+                            ...prevJobp,
+                            job: value,
+                            skills: null,
+                          }));
+                        }
+                      }}
                     />
-                </Grid>
-                <Grid item xs={12}>
-                    <Button
-                    variant="outlined"
-                    color="primary"
-                    onClick={handleSubmit}
-                    style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        transform: 'scale(1)',
-                        transition: 'all 0.3s ease-in-out',
-                        position: 'relative',
-                        borderColor: '#4CAF50',
-                        color: '#4CAF50',
-                    }}
-                    onMouseOver={(e) => {
-                        e.currentTarget.style.backgroundColor = '#4CAF50';
-                        e.currentTarget.style.transform = 'scale(1.1)';
-                        e.currentTarget.style.color = '#ffffff';
-                    }}
-                    onMouseOut={(e) => {
-                        e.currentTarget.style.backgroundColor = 'transparent';
-                        e.currentTarget.style.transform = 'scale(1)';
-                        e.currentTarget.style.color = '#4CAF50';
-                    }}
-                    disabled={loading}
-                    >
-                    {loading ? (
-                        <CircularProgress size={20} style={{ position: 'absolute' }} />
-                    ) : (
-                        <SendIcon style={{ marginRight: '0.5rem' }} />
+                  </Grid>
+                  <Grid item xs={6}>
+                    {jobp.job && (
+                      <Autocomplete
+                        size='small'
+                        options={jobSkills[jobp.job] || []}
+                        renderInput={(params) => <TextField {...params} label='Skills' variant='outlined' />}
+                        value={jobp.skills || null}
+                        onChange={(event, value) => {
+                          setjobp((prevJobp) => ({
+                            ...prevJobp,
+                            skills: value,
+                          }));
+                        }}
+                        disabled={!jobp.job}
+                      />
                     )}
-                    {loading ? 'Posting...' : 'Post'}
+                  </Grid>
+                  <Grid item xs={12}>
+                      <TextareaAutosize
+                      placeholder='Description'
+                      style={{
+                          width: '100%',
+                          padding: '0.5rem',
+                          fontSize: '1rem',
+                          borderRadius: '4px',
+                          
+                      }}
+                      value={jobp.description} name='description' onChange={handleInputs}
+                      />
+                  </Grid>
+                  <Grid item xs={6} >
+                  <div>
+                      <TextField
+                        label="Pricing"
+                        size='small'
+                        fullWidth
+                        value={ethValue && jobp.pricing}
+                        name="pricing"
+                        onChange={(event) => {
+                          handleEthChange(event);
+                          handleInputs(event);
+                        }}
+                        InputProps={{
+                          inputProps: {
+                            pattern: /^\d*\.?\d*$/,
+                          },
+                        }}
+                      />
+                      <div>
+                        {ethValue && ethToUsdRate !== null && (
+                          <p>
+                            {ethValue} Ethereum is approximately ${calculateUsdValue()} USD
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  </Grid>
+                  <Grid item xs={3}>
+                    <input
+                      type="file"
+                      accept=".png,.pdf,.doc,.docx"
+                      onChange={handleFileChange}
+                      style={{ visibility: 'hidden', width: '1px' }}
+                      ref={fileInputRef}
+                    />
+                    <Button
+                      variant="outlined"
+                      color="primary"
+                      onClick={() => fileInputRef.current.click()}
+                    >
+                      Attach File
                     </Button>
-                </Grid>
-                </Grid>
+                  </Grid>
+                  <Grid item xs={3}>
+                    {selectedFile && <p>Attached File: {selectedFile.name}</p>}
+                  </Grid>
+                  <Grid item xs={12}>
+                      <Button
+                      variant="outlined"
+                      color="primary"
+                      onClick={handleSubmit}
+                      style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          transform: 'scale(1)',
+                          transition: 'all 0.3s ease-in-out',
+                          position: 'relative',
+                          borderColor: '#4CAF50',
+                          color: '#4CAF50',
+                      }}
+                      onMouseOver={(e) => {
+                          e.currentTarget.style.backgroundColor = '#4CAF50';
+                          e.currentTarget.style.transform = 'scale(1.1)';
+                          e.currentTarget.style.color = '#ffffff';
+                      }}
+                      onMouseOut={(e) => {
+                          e.currentTarget.style.backgroundColor = 'transparent';
+                          e.currentTarget.style.transform = 'scale(1)';
+                          e.currentTarget.style.color = '#4CAF50';
+                      }}
+                      disabled={loading}
+                      >
+                      {loading ? (
+                          <CircularProgress size={20} style={{ position: 'absolute' }} />
+                      ) : (
+                          <SendIcon style={{ marginRight: '0.5rem' }} />
+                      )}
+                      {loading ? 'Posting...' : 'Post'}
+                      </Button>
+                  </Grid>
+                  </Grid>
+                </div>
+              </div>
             </div>
-            </div>
-        </div>
         </Container>
         </Grid>
-        )}
-        <Grid item xs={12}>
+      )}
+        <Grid item xs={8}>
         <Container maxWidth="md" className="p-5">
-          <Paper elevation={0} square sx={{ p: 5 }}>
+        <div className='shadow-lg p-3 mb-5 bg bg-white rounded' >
+        <Paper elevation={0} square sx={{ p: 5 }}>
+        <h4>Jobs you might like</h4>
+        <br/>
+        <TextField
+            type="text"
+            placeholder="Search jobs..."
+            size='small'
+            fullWidth
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton>
+                    <SearchIcon />
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
+          />
             <List>
-              {jobPostings.map((job, index) => (
+              {filteredJobPostings.map((job, index) => (
                 <ListItem
                   key={index}
                   button
@@ -458,37 +618,8 @@ const JobPosting = () => {
                       marginBottom: 0,
                     },
                   }}
+                  onClick={() => handleOpenModal(job)}
                 >
-                  {/* Like Button */}
-                  <IconButton
-                    aria-label="like"
-                    color="primary"
-                    sx={{
-                      position: 'absolute',
-                      top: 0,
-                      right: 40,
-                      '&:hover': {
-                        transform: 'scale(1.2)',
-                      },
-                    }}
-                  >
-                    <ThumbUpIcon />
-                  </IconButton>
-                  {/* Dislike Button */}
-                  <IconButton
-                    aria-label="dislike"
-                    color="primary"
-                    sx={{
-                      position: 'absolute',
-                      top: 0,
-                      right: 0,
-                      '&:hover': {
-                        transform: 'scale(1.2)',
-                      },
-                    }}
-                  >
-                    <ThumbDownIcon />
-                  </IconButton>
                   <ListItemText
                     primary={<strong>{job.job}</strong>}
                     secondary={job.skills}
@@ -508,8 +639,38 @@ const JobPosting = () => {
               ))}
             </List>
           </Paper>
+        </div>
+        <Dialog open={openModal} onClose={handleCloseModal} maxWidth="md" fullWidth>
+        {selectedJob && (
+          <>
+            <DialogTitle>{selectedJob.job}</DialogTitle>
+            <DialogContent>
+              <DialogContentText>
+                {selectedJob.description}
+                </DialogContentText>
+                
+                {selectedJob.attachment && (
+                <>
+                  <strong>Attachment:</strong>
+                  <div>Filename: {selectedJob.attachment.filename}</div>
+                  <div>Original Name: {selectedJob.attachment.originalname}</div>
+                  <div>Mimetype: {selectedJob.attachment.mimetype}</div>
+                  <a
+                    href={`/path/to/attachment/${selectedJob.attachment.filename}`}
+                    download
+                  >
+                    Download Attachment
+                  </a>
+                </>
+              )}
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={handleCloseModal}>Close</Button>
+            </DialogActions>
+          </>
+        )}
+      </Dialog>
         </Container>
-
       </Grid>
     </Grid>
   <ToastContainer/>

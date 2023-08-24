@@ -3,7 +3,7 @@ const router = express.Router();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const authenticate = require('../middleware/authenticate')
-
+const multer = require('multer');
 router.get('/', (req,res) => {
      res.send('Hello World router');
 });
@@ -102,20 +102,51 @@ const DevJob = require('../model/devjobpostingschema');
      }
  })
 
+ const storage = multer.diskStorage({
+     destination: 'uploads/',
+     filename: function (req, file, cb) {
+       const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+       cb(null, file.fieldname + '-' + uniqueSuffix);
+     },
+   });
+   
+   const upload = multer({ storage });
+
  //jobposting
- router.post('/jobposting',async (req,res)=>{
-     const {job,skills,description,createdOn,createdBy} = req.body;
+ router.post('/jobposting',upload.single('file'),async (req,res)=>{
+     const {job,skills,description,createdOn,createdBy,title,expertise,pricing} = req.body;
      
-     if( !job || !skills || !description || !createdOn || !createdBy ) {
+     if( !job || !skills || !description || !createdOn || !createdBy || !title || !expertise || !pricing ) {
          return res.status(422).json({error: "Please Add Missing Fields"});
      }
      try {
-         const jp = new DevJob({job,skills,description,createdOn,createdBy});
-         await jp.save();
-         res.status(201).json({message:"Job Posted"});
-     } catch (error) {
-         console.log(error)
-     }
+          const file = req.file;
+          const fileInfo = file
+            ? {
+                filename: file.filename,
+                originalname: file.originalname,
+                mimetype: file.mimetype,
+              }
+            : null;
+      
+          const newJobPosting = new DevJob({
+            job,
+            skills,
+            description,
+            createdOn,
+            createdBy,
+            title,
+            expertise,
+            pricing,
+            attachment: fileInfo,
+          });
+      
+          await newJobPosting.save();
+          res.status(201).json({ message: "Job Posted" });
+        } catch (error) {
+          console.error('Error posting job:', error);
+          res.status(500).json({ error: 'Job posting failed.' });
+        }
  });
 
  router.get('/jobpostings', async (req, res) => {

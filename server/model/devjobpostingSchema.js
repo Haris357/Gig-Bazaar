@@ -22,7 +22,24 @@ const devjobpostingSchema = new mongoose.Schema({
     createdBy:{
         type:String,
         required:true   
-    }
+    },
+    title:{
+        type:String,
+        required:true,
+    },
+    expertise:{
+        type:String,
+        required:true,
+    },
+    pricing:{
+        type:Number,
+        required:true, 
+    },
+    attachment: {
+        filename: String,
+        originalname: String,
+        mimetype: String,
+      },
 })
 const DevJob = mongoose.model('DevJobs',devjobpostingSchema);
 
