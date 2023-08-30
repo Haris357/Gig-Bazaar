@@ -113,10 +113,10 @@ const DevJob = require('../model/devjobpostingschema');
    const upload = multer({ storage });
 
  //jobposting
- router.post('/jobposting',upload.single('file'),async (req,res)=>{
-     const {job,skills,description,createdOn,createdBy,title,expertise,pricing} = req.body;
+ router.post('/jobposting',authenticate,upload.single('file'),async (req,res)=>{
+     const {job,skills,description,createdOn,createdBy,title,expertise,pricing,flexibility,estimatedtime} = req.body;
      
-     if( !job || !skills || !description || !createdOn || !createdBy || !title || !expertise || !pricing ) {
+     if( !job || !skills || !description || !createdOn || !createdBy || !title || !expertise || !pricing || !flexibility || !estimatedtime ) {
          return res.status(422).json({error: "Please Add Missing Fields"});
      }
      try {
@@ -139,6 +139,8 @@ const DevJob = require('../model/devjobpostingschema');
             expertise,
             pricing,
             attachment: fileInfo,
+            flexibility,
+            estimatedtime,
           });
       
           await newJobPosting.save();

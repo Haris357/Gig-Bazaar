@@ -35,6 +35,14 @@ const devjobpostingSchema = new mongoose.Schema({
         type:Number,
         required:true, 
     },
+    flexibility:{
+        type:String,
+        required:true,
+    },
+    estimatedtime:{
+        type:String,
+        required:true,
+    },
     attachment: {
         filename: String,
         originalname: String,

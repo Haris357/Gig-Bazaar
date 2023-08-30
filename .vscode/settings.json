@@ -1,8 +1,11 @@
 {
     "cSpell.words": [
+        "accountname",
         "Appbar",
         "appllication",
         "boxin",
+        "Changeest",
+        "Changeflex",
         "darkgreen",
         "describedby",
         "Deverse",
@@ -11,8 +14,11 @@
         "devproposals",
         "DEVUSER",
         "devusers",
+        "estimatedtime",
+        "fieldname",
         "firstname",
         "getdata",
+        "handleweb",
         "hidemodal",
         "hiretalent",
         "hoverable",
@@ -31,6 +37,8 @@
         "usersignin",
         "usersignout",
         "usersignup",
-        "verifytoken"
+        "verifytoken",
+        "webmodal",
+        "webset"
     ]
 }

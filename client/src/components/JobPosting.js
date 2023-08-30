@@ -12,14 +12,16 @@ import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate } from 'react-router-dom';
 import Autocomplete from '@mui/material/Autocomplete';
 import { Paper, List, ListItem, ListItemText,IconButton } from '@mui/material';
-import ThumbUpIcon from '@mui/icons-material/ThumbUp';
-import ThumbDownIcon from '@mui/icons-material/ThumbDown';
 import { formatDistanceToNow } from 'date-fns';
 import InputAdornment from '@mui/material/InputAdornment';
 import SearchIcon from '@mui/icons-material/Search';
-import {Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from '@mui/material';
+import {Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Divider } from '@mui/material';
 import Web3 from 'web3';
-
+import CheckIcon from '@mui/icons-material/Check';
+import BookmarkIcon from '@mui/icons-material/Bookmark';
+import FlagIcon from '@mui/icons-material/Flag';
+import Avatar from '@mui/material/Avatar';
+import PersonIcon from '@mui/icons-material/Person';
 
 const JobPosting = () => {
 
@@ -248,7 +250,7 @@ const JobPosting = () => {
   
   const userid = userData.firstname;
   const [jobp,setjobp] = useState({
-    job:"",skills:"",description:"",createdOn:currentDateTime,createdBy:userid,title:"",expertise:"",pricing:null
+    job:"",skills:"",description:"",createdOn:currentDateTime,createdBy:userid,title:"",expertise:"",pricing:null,flexibility:"",estimatedtime:""
   });
 
   useEffect(() => {
@@ -273,6 +275,8 @@ const JobPosting = () => {
     formData.append('title', jobp.title);
     formData.append('expertise', jobp.expertise);
     formData.append('pricing', jobp.pricing);
+    formData.append('flexibility', jobp.flexibility);
+    formData.append('estimatedtime',jobp.estimatedtime);
 
   
     try {
@@ -340,6 +344,14 @@ const JobPosting = () => {
     handleInputs({ target: { name: 'expertise', value: newValue } });
   };
 
+  const handleAutocompleteChangeflex = (_, newValue) => {
+    handleInputs({ target: { name: 'flexibility', value: newValue } });
+  };
+
+  const handleAutocompleteChangeest = (_,newValue) => {
+    handleInputs({target: {name:"estimatedtime",value:newValue}});
+  }
+
   const [searchTerm, setSearchTerm] = useState('');
   const [openModal, setOpenModal] = useState(false);
   const [selectedJob, setSelectedJob] = useState(null);
@@ -401,13 +413,16 @@ const [ethValue, setEthValue] = useState('');
     }
   };
   
+  const OnProfile = () => {
+    navigate('/UserProfile');
+  }
 
   return (
     <>
     <Grid container spacing={0}>
       {userData.designation === 'Client' &&(
-        <Grid item xs={11}>
-        <Container maxWidth='lg' className='p-3'>
+        <Grid item xs={12}>
+        <Container maxWidth='xl' className='p-5'>
         <div className='shadow-lg p-3  bg bg-white rounded'>
             <div className='row'>
               <div className='col'>
@@ -492,7 +507,7 @@ const [ethValue, setEthValue] = useState('');
                       value={jobp.description} name='description' onChange={handleInputs}
                       />
                   </Grid>
-                  <Grid item xs={6} >
+                  <Grid item xs={4} >
                   <div>
                       <TextField
                         label="Pricing"
@@ -519,7 +534,40 @@ const [ethValue, setEthValue] = useState('');
                       </div>
                     </div>
                   </Grid>
-                  <Grid item xs={3}>
+                  <Grid item xs={4} >
+                    <Autocomplete
+                    size='small'
+                    options={[
+                      "Fixed Price",
+                      "Negotiable"
+                    ]}
+                    renderInput={(params) => <TextField {...params} label="Price Flexibility" />}
+                    name="flexibility"
+                    value={jobp.flexibility || null}
+                    onChange={handleAutocompleteChangeflex}
+                    />
+                  </Grid>
+                  <Grid item xs={4} >
+                  <Autocomplete
+                  size='small'
+                  options={[
+                    "3 Hours",
+                    "6 Hours",
+                    "12 Hours",
+                    "1 Day",
+                    "3 Day",
+                    "1 Week",
+                    "1 Month",
+                    "3 Months",
+                    "6 Months",
+                  ]}
+                  renderInput={(params) => <TextField {...params} label="Estimated Time" />}
+                  name="estimatedtime"
+                  value={jobp.estimatedtime || null}
+                  onChange={handleAutocompleteChangeest}
+                  />
+                  </Grid>
+                  <Grid item xs={4}>
                     <input
                       type="file"
                       accept=".png,.pdf,.doc,.docx"
@@ -534,9 +582,9 @@ const [ethValue, setEthValue] = useState('');
                     >
                       Attach File
                     </Button>
-                  </Grid>
-                  <Grid item xs={3}>
                     {selectedFile && <p>Attached File: {selectedFile.name}</p>}
+                  </Grid>
+                  <Grid item xs={4}> 
                   </Grid>
                   <Grid item xs={12}>
                       <Button
@@ -580,8 +628,8 @@ const [ethValue, setEthValue] = useState('');
         </Container>
         </Grid>
       )}
-        <Grid item xs={8}>
-        <Container maxWidth="md" className="p-5">
+        <Grid item xs={9}>
+        <Container maxWidth="lg" className="p-5">
         <div className='shadow-lg p-3 mb-5 bg bg-white rounded' >
         <Paper elevation={0} square sx={{ p: 5 }}>
         <h4>Jobs you might like</h4>
@@ -640,7 +688,7 @@ const [ethValue, setEthValue] = useState('');
             </List>
           </Paper>
         </div>
-        <Dialog open={openModal} onClose={handleCloseModal} maxWidth="md" fullWidth>
+        {/* <Dialog open={openModal} onClose={handleCloseModal} maxWidth="lg" fullWidth>
         {selectedJob && (
           <>
             <DialogTitle>{selectedJob.job}</DialogTitle>
@@ -669,9 +717,148 @@ const [ethValue, setEthValue] = useState('');
             </DialogActions>
           </>
         )}
-      </Dialog>
+      </Dialog> */}
+          {userData.designation === 'Freelancer' && (
+            <Dialog open={openModal} onClose={handleCloseModal} maxWidth="lg" fullWidth>
+            {selectedJob && (
+              <>
+                {/* <DialogTitle>{selectedJob.job}</DialogTitle> */}
+                <DialogContent>
+                  <DialogContentText>
+                    {/* Introduction or overview content can go here */}
+                  </DialogContentText>
+                  
+                  <Grid container spacing={2}>
+                    {/* Left Column */}
+                    <Grid item xs={12} md={6}>
+                      <section>
+                        <h4>{selectedJob.title}</h4>
+                        <br/>
+                        <p>{selectedJob.job}</p>
+                        <p>Posted: {formatDistanceToNow(new Date(selectedJob.createdOn), { addSuffix: true })}</p>
+                      </section>
+                      <Divider />
+                      {/* Section 3: Description */}
+                      <section>
+                        <p>{selectedJob.description}</p>
+                      </section>
+                      <Divider />
+
+                      {/* Section 5: Job Link */}
+                      <section>
+                        <h2>Job Link</h2>
+                        <p>Provide a link to the job posting or related resources.</p>
+                      </section>
+                      <Divider />
+
+                      {/* Section 7: Project Type */}
+                      <section>
+                        <h2>Project Type</h2>
+                        <p>Describe the type of project or work involved.</p>
+                      </section>
+                      <Divider />
+
+                      {/* Section 9: Activity in This Job */}
+                      <section>
+                        <h2>Activity in This Job</h2>
+                        <p>Discuss the ongoing tasks and activity related to the job.</p>
+                      </section>
+                      <Divider />
+
+                    </Grid>
+
+                    {/* Right Column */}
+                    <Grid item xs={12} md={6}>
+                      {/* Section 3: Apply Now */}
+                      <section>
+                        <Grid container spacing={1} textAlign="left">
+                          <Grid item xs={12}>
+                            <Button variant='contained' size='small' color='success' startIcon={<CheckIcon />}>
+                              Apply Now
+                            </Button>
+                          </Grid>
+                          <Grid item xs={12}>
+                            <Button variant='outlined' size='small' color='success' startIcon={<BookmarkIcon />}>
+                              Save Job
+                            </Button>
+                          </Grid>
+                          <Grid item xs={12}>
+                            <Button size='small' color='success' startIcon={<FlagIcon />}>
+                              Flag as Inappropriate
+                            </Button>
+                          </Grid>
+                        </Grid>
+                      </section>
+                      <Divider />
+
+                      {/* Section 4: About the Client */}
+                      <section>
+                        <p>Posted By: {selectedJob.createdBy}</p>
+                      </section>
+                      <Divider />
+
+                      {/* Section 6: Flexibility */}
+                      <section>
+                        <h2>Flexibility</h2>
+                        <p>Explain any flexibility options regarding the job.</p>
+                      </section>
+                      <Divider />
+
+                      {/* Section 8: Skills and Expertise */}
+                      <section>
+                        <h2>Skills and Expertise</h2>
+                        <p>List the required skills and expertise for the job.</p>
+                      </section>
+                      <Divider />
+
+                      {/* Section 10: Client History */}
+                      <section>
+                        <h2>Client History</h2>
+                        <p>Provide background information about the client's history.</p>
+                      </section>
+                      <Divider />
+
+                      {/* Section 11: Similar Job */}
+                      <section>
+                        <h2>Similar Job</h2>
+                        <p>Link or describe similar jobs for reference.</p>
+                      </section>
+                      <Divider />
+
+                    </Grid>
+                  </Grid>
+                </DialogContent>
+                <DialogActions>
+                  <Button onClick={handleCloseModal}>Close</Button>
+                </DialogActions>
+              </>
+            )}
+        </Dialog>
+      )}
         </Container>
       </Grid>
+      <Grid item xs={3} >
+      <Container maxWidth='sm' className='p-5'>
+      <div className='shadow-lg p-3 mb-5 bg-white rounded'>
+        <Avatar
+          sx={{
+            width: 100,
+            height: 100,
+            margin: '0 auto',
+            marginBottom: '1rem',
+            border: '2px solid #fff',
+          }}
+        >
+          <PersonIcon fontSize='large' />
+        </Avatar>
+        <div style={{ textAlign: 'center' }}>
+          <h4>{userData.firstname}</h4>
+          <Button color='success' variant="contained" onClick={OnProfile}>Profile</Button>
+        </div>
+      </div>
+    </Container>
+      </Grid>
+
     </Grid>
   <ToastContainer/>
     </>

@@ -12,7 +12,10 @@ import UserSignIn from './components/UserSignIn';
 import UserSignOut from './components/UserSignOut';
 import JobPosting from './components/JobPosting';
 import FLAppbar from './components/FLAppbar';
-import Wallet from './components/Web3Wallet';
+import UserProfile from './components/UserProfile';
+import UserSettings from './components/UserSettings';
+import UserNavbar from './components/UserNavbar';
+
 const App = () => {
   const [userData, setUserData] = useState({});
   const [isLoading, setIsLoading] = useState(true);
@@ -47,17 +50,18 @@ const App = () => {
 
   return (
     <>
-    {isLoading ? null : userData.designation ? <FLAppbar /> : < Navbar/>}
+    {isLoading ? null : userData.designation ? <UserNavbar /> : < Navbar/>}
     <Routes>
       <Route exact path="/" element={<Home />} />
       <Route path="/about" element={<About />} />
-      <Route path="/Web3" element={<Wallet />} />
       <Route path="/contact" element={<Contact />} />
       <Route path="/UserSignIn" element={<UserSignIn />} />
       <Route path="/*" element={<ErrorPage />} />
       <Route path="/UserSignUp" element={<UserSignUp />} />
       <Route path="/JobPosting" element={<JobPosting />} />
       <Route path="/UserSignOut" element={<UserSignOut />} />
+      <Route path="/UserProfile" element={<UserProfile />} />
+      <Route path="/UserSettings" element={<UserSettings />} />
     </Routes>
     </>
   )
