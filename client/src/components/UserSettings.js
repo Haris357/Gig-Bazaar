@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Grid, Container, Divider, List, ListItem, ListItemText,Collapse  } from '@mui/material';
+import { Grid, Container, Divider, List, ListItem, ListItemText, Collapse } from '@mui/material';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import Avatar from '@mui/material/Avatar';
 import PersonIcon from '@mui/icons-material/Person';
-import Web3Wallet from '../components/Web3Wallet'
+import Web3Wallet from '../components/Web3Wallet';
+
 const UserSettings = () => {
   const [userData, setUserData] = useState({});
   const [selectedMenu, setSelectedMenu] = useState(null);
@@ -42,27 +43,27 @@ const UserSettings = () => {
   const handleSubMenuClick = () => {
     setSubMenuOpen(!subMenuOpen);
   };
-  
+
   return (
-    <Grid container spacing={0}>
-      <Container maxWidth='lg' className='p-5'>
-        <div className='shadow-lg p-3 mb-5 bg-white rounded'>
+    <Container maxWidth='lg' className='p-5'>
+      <div className='shadow-lg p-3 mb-5 bg-white rounded'>
+        <Grid container spacing={0}>
           <Grid item xs={12}>
-          <Avatar
-          sx={{
-            width: 100,
-            height: 100,
-            border: '2px solid #fff',
-          }}
-        >
-          <PersonIcon fontSize='large' />
-        </Avatar>
-        <br/>
+            <Avatar
+              sx={{
+                width: 100,
+                height: 100,
+                border: '2px solid #fff',
+              }}
+            >
+              <PersonIcon fontSize='large' />
+            </Avatar>
+            <br />
             <h4>{userData.firstname} {userData.lastname}</h4>
           </Grid>
           <Divider />
           <Grid container spacing={0}>
-            <Grid item xs={4}>
+            <Grid item xs={12} md={4}>
               <List>
                 <ListItem button onClick={handleSubMenuClick}>
                   <ListItemText primary="Your Work" />
@@ -89,12 +90,12 @@ const UserSettings = () => {
                 </ListItem>
               </List>
             </Grid>
-            <Grid item xs={8}>
+            <Grid item xs={12} md={8}>
               {selectedMenu === 'menu1' && (
-                <Grid container spacing={0} >
-                    <Container className='p-2' >
-                        <Web3Wallet/>
-                    </Container>
+                <Grid container spacing={0}>
+                  <Container className='p-2'>
+                    <Web3Wallet />
+                  </Container>
                 </Grid>
               )}
               {selectedMenu === 'menu2' && (
@@ -109,9 +110,9 @@ const UserSettings = () => {
               )}
             </Grid>
           </Grid>
-        </div>
-      </Container>
-    </Grid>
+        </Grid>
+      </div>
+    </Container>
   );
 };
 

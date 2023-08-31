@@ -19,6 +19,7 @@
         "firstname",
         "getdata",
         "handleweb",
+        "hexlify",
         "hidemodal",
         "hiretalent",
         "hoverable",

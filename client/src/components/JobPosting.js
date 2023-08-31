@@ -261,7 +261,6 @@ const JobPosting = () => {
   }, [userData]);
 
   const handleSubmit = async (e) => {
-    debugger;
     setLoading(true);
     e.preventDefault();
   
@@ -306,7 +305,6 @@ const JobPosting = () => {
   const [jobPostings, setJobPostings] = useState([]);
 
   const fetchJobPostings = async () => {
-    debugger;
     try {
       const res = await fetch('/jobpostings', {
         method: 'GET',
@@ -628,7 +626,10 @@ const [ethValue, setEthValue] = useState('');
         </Container>
         </Grid>
       )}
-        <Grid item xs={9}>
+      <Grid container >
+
+      </Grid>
+      <Grid item xs={12} md={9}>
         <Container maxWidth="lg" className="p-5">
         <div className='shadow-lg p-3 mb-5 bg bg-white rounded' >
         <Paper elevation={0} square sx={{ p: 5 }}>
@@ -837,7 +838,7 @@ const [ethValue, setEthValue] = useState('');
       )}
         </Container>
       </Grid>
-      <Grid item xs={3} >
+      <Grid item xs={12} md={3}>
       <Container maxWidth='sm' className='p-5'>
       <div className='shadow-lg p-3 mb-5 bg-white rounded'>
         <Avatar
@@ -857,8 +858,7 @@ const [ethValue, setEthValue] = useState('');
         </div>
       </div>
     </Container>
-      </Grid>
-
+      </Grid>   
     </Grid>
   <ToastContainer/>
     </>

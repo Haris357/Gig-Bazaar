@@ -35,7 +35,17 @@ const devusersSchema = new mongoose.Schema({
                 required:true
             }
         }
+    ],
+    UserProfileWork:[
+        {
+            work:{type:String,required:true},
+            workHeading:{type:String,required:true},
+            workSpecialization:{type:String,required:true},
+            hourlyRate:{type:String,required:true},
+            workDescription:{type:String,required:true}
+        }
     ]
+
 
 })
 
@@ -56,6 +66,16 @@ devusersSchema.methods.generateAuthToken = async function(){
     }
     catch(err){
         console.log(err);
+    }
+}
+//Storing UserProfileWork
+devusersSchema.methods.addUserProfileWork = async function ( work, workHeading, workSpecialization, hourlyRate, workDescription, _id, firstname, designation ){
+    try {
+        this.UserProfileWork = this.UserProfileWork.concat({ work, workHeading, workSpecialization, hourlyRate, workDescription, _id, firstname, designation });
+        await this.save();
+        return this.UserProfileWork;
+    } catch (error) {
+        console.log(error)
     }
 }
 

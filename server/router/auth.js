@@ -174,5 +174,23 @@ router.get('/logout', (req, res) => {
      res.clearCookie('jwtoken', { path: '/' });
      res.status(200).send('User Logout');
    });
+//UserProfileWork   
+router.post('/UserProfileWork',authenticate,async(req,res)=>{
+     try {
+          const {work, workHeading, workSpecialization, hourlyRate, workDescription, _id, firstname, designation} = req.body;
+          if(!work || !workHeading || !workSpecialization || !hourlyRate || !workDescription || !_id || !firstname || !designation){
+               console.log("error in User Profile");
+               return res.json({error:"please fill the userprofile"})
+          }
+          const UserProfileWork = await DevUser.findOne({_id: req.userID});
+          if(UserProfileWork){
+               const userProfile = await UserProfileWork.addUserProfileWork(work, workHeading, workSpecialization, hourlyRate, workDescription, _id, firstname, designation);
+               await UserProfileWork.save();
+               res.status(201).json({message: "User Profile Updated Successfully"});
+          } 
+     } catch (error) {
+          console.log(error);
+     }
+})
    
 module.exports = router;

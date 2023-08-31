@@ -1,10 +1,11 @@
 /* eslint-disable no-unused-vars */
 import MetaMask from '../img/fox.png'
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import { ethers } from 'ethers';
 import { ToastContainer, toast } from 'react-toastify';
 import { Breadcrumbs, Button, Container, Divider, Grid, TextField } from '@mui/material';
 import { CheckCircleOutline, CancelOutlined } from '@mui/icons-material';
+import Web3 from 'web3';
 
 const Web3Wallet = () => {
   const [defaultAccount, setDefaultAccount] = useState(null);
@@ -48,48 +49,90 @@ const Web3Wallet = () => {
       });
   };
 
-  // const sendTransaction = async (e) => {
-  //   let params = [{
-  //     from: "0x1230E01151f01B52EadB544c73c6BA7819B1B6f9",
-  //     to: e.target.to_address.value,
-  //     gas: Number(21000).toString(16),
-  //     gasPrice: Number(2500000).toString(16),
-  //     value: Number(1000000000000000).toString(16),
-  //   }]
-
-  //   let result = await window.ethereum.request({method:"eth_sendTransaction",params}).catch((err) => {
-  //     toast.error(err);
-  //   })
-  // }
-  
   const sendTransaction = async () => {
-    debugger;
-    if (!transactionValue || !recipientAddress) {
-      toast.warning('Please enter both a transaction value and a recipient address');
-      return;
-    }
-
-    const params = [
-      {
+    try {
+      const weiValue = (parseFloat(transactionValue) * Math.pow(10, 18)).toString(16);
+  
+      const params = [{
         from: defaultAccount,
         to: recipientAddress,
-        value: ethers.parseEther(String(transactionValue)),
-      },
-    ];
+        gas: Number(21000).toString(16),
+        gasPrice: Number(2500000).toString(16),
+        value: "0x" + weiValue,
+      }];
+  
+      const result = await window.ethereum.request({ method: "eth_sendTransaction", params });
 
-    try {
-      const gasEstimate = await window.ethereum.request({ method: "eth_estimateGas", params });
-      const gasPrice = await window.ethereum.request({ method: "eth_gasPrice" });
-      params[0].gas = gasEstimate;
-      params[0].gasPrice = gasPrice;
-
-      let result = await window.ethereum.request({method:"eth_sendTransaction",params}).catch((err) => {
-           console.log(err);
-          })
-    } catch (error) {
-      console.log(error);
+    } catch (err) {
+      toast.error(err.message || "An error occurred while sending the transaction.");
     }
   };
+  
+  const [ethValue, setEthValue] = useState('');
+  const [ethToUsdRate, setEthToUsdRate] = useState(null);
+
+  const handleEthChange = (event) => {
+    const input = event.target.value;
+
+    if (/^\d*\.?\d*$/.test(input)) {
+      setEthValue(input);
+    }
+  };
+
+  const fetchEthereumPrice = async () => {
+    try {
+      const web3 = new Web3('https://mainnet.infura.io/v3/YOUR_INFURA_PROJECT_ID');
+      const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd');
+      const data = await response.json();
+      const ethPriceInUSD = data.ethereum.usd;
+      setEthToUsdRate(ethPriceInUSD);
+    } catch (error) {
+      console.error('Error fetching Ethereum price:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchEthereumPrice();
+  }, []);
+
+  const calculateUsdValue = () => {
+    const ethAmount = parseFloat(ethValue);
+    if (!isNaN(ethAmount) && ethToUsdRate !== null) {
+      return (ethAmount * ethToUsdRate).toFixed(2);
+    }
+    return '';
+  };
+  
+  // const sendTransaction = async () => {
+  //   debugger;
+  //   if (!transactionValue || !recipientAddress) {
+  //     toast.warning('Please enter both a transaction value and a recipient address');
+  //     return;
+  //   }
+
+  //   const params = [
+  //     {
+  //       from: defaultAccount,
+  //       to: recipientAddress,
+  //       gas: Number(21000).toString(16),
+  //       gasPrice: Number(2500000).toString(16),
+  //       value: ethers.parseEther(String(transactionValue)),
+  //     },
+  //   ];
+
+  //   try {
+  //     // const gasEstimate = Number(21000).toString(16);//await window.ethereum.request({ method: "eth_estimateGas", params });
+  //     // const gasPrice = Number(2500000).toString(16); //await window.ethereum.request({ method: "eth_gasPrice" });
+  //     // params[0].gas = gasEstimate;
+  //     // params[0].gasPrice = gasPrice;
+
+  //     let result = await window.ethereum.request({method:"eth_sendTransaction",params}).catch((err) => {
+  //           toast.error(err);
+  //         })
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // };
 
   return (
     <>
@@ -129,8 +172,23 @@ const Web3Wallet = () => {
                         label="Transaction Value (Ether)"
                         variant="outlined"
                         value={transactionValue}
-                        onChange={(e) => setTransactionValue(e.target.value)}
+                        onChange={(event) => {
+                          setTransactionValue(event.target.value);
+                          handleEthChange(event);
+                        }}
+                        InputProps={{
+                          inputProps: {
+                            pattern: /^\d*\.?\d*$/,
+                          },
+                        }}
                       />
+                      <div>
+                        {ethValue && ethToUsdRate !== null && (
+                          <p>
+                            {ethValue} Ethereum is approximately ${calculateUsdValue()} USD
+                          </p>
+                        )}
+                      </div>
                     </Grid>
                     <Grid item xs={12}>
                       <Button color="warning" size="small" variant="contained" onClick={sendTransaction}>
