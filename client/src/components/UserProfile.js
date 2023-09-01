@@ -1,7 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable no-unused-vars */
 import React, { useState, useEffect } from 'react';
-import { Grid, Container, Divider, List, ListItem, ListItemText, Collapse,Modal, TextField, Button } from '@mui/material';
+import { Grid, Container, Divider, List, ListItem, ListItemText, Collapse, TextField, Button, Typography } from '@mui/material';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import Avatar from '@mui/material/Avatar';
@@ -12,8 +11,10 @@ import AddIcon from '@mui/icons-material/Add';
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
 import CloseIcon from '@mui/icons-material/Close';
+import EditIcon from '@mui/icons-material/Edit';
+import LocationOnIcon from '@mui/icons-material/LocationOn';
+
 
 const UserProfile = () => {
   const [userData, setUserData] = useState({
@@ -26,7 +27,7 @@ const UserProfile = () => {
     _id: '',
     designation: '',
   });
-  
+
   const [selectedMenu, setSelectedMenu] = useState(null);
   const [subMenuOpen, setSubMenuOpen] = useState(false);
   const [openModal, setOpenModal] = useState(false);
@@ -42,7 +43,7 @@ const UserProfile = () => {
         credentials: 'include',
       });
       const data = await res.json();
-      setUserData({ ...userData, _id:userData._id, firstname:userData.firstname, designation:userData.designation })
+      setUserData({ ...userData, _id: userData._id, firstname: userData.firstname, designation: userData.designation })
       setUserData(data);
       if (res.status !== 200) {
         const error = new Error(res.error);
@@ -55,27 +56,27 @@ const UserProfile = () => {
 
   useEffect(() => {
     UserCall();
-  }, []);
+  },[]);
 
-  const UserProfileWork = async (e) =>{
+  const UserProfileWork = async (e) => {
     e.preventDefault();
-    const { work,workHeading, workSpecialization,hourlyRate,workDescription,firstname,_id,designation}  = userData;
-    const res = await fetch('/UserProfileWork',{
-      method:"POST",
+    const { work, workHeading, workSpecialization, hourlyRate, workDescription, firstname, _id, designation } = userData;
+    const res = await fetch('/UserProfileWork', {
+      method: "POST",
       headers: {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        work,workHeading, workSpecialization,hourlyRate,workDescription,_id,firstname,designation
+        work, workHeading, workSpecialization, hourlyRate, workDescription, _id, firstname, designation
       })
     })
 
     const data = await res.json();
-    if(!data){
+    if (!data) {
       toast.error('something went wrong');
     } else {
       toast.success('User Profile Work Updated Successfully')
-      setUserData({ ...userData,work:"",workHeading:"", workSpecialization:"",hourlyRate:"",workDescription:""})
+      setUserData({ ...userData, work: "", workHeading: "", workSpecialization: "", hourlyRate: "", workDescription: "" })
     }
 
   }
@@ -89,113 +90,146 @@ const UserProfile = () => {
   };
 
   const handleOpenModal = () => {
-  setOpenModal(true);
-};
+    setOpenModal(true);
+  };
 
-const handleCloseModal = () => {
-  setOpenModal(false);
-};
+  const handleCloseModal = () => {
+    setOpenModal(false);
+  };
 
-const handleInputs = (e) => {
-  const name = e.target.name;
-  const value = e.target.value;
-  setUserData({...userData,[name]:value});
-}
+  const handleInputs = (e) => {
+    const name = e.target.name;
+    const value = e.target.value;
+    setUserData({ ...userData, [name]: value });
+  }
 
   return (
     <>
-    <Dialog open={openModal} onClose={handleCloseModal}>
-      <DialogTitle>Add Work</DialogTitle>
-      <IconButton
-        aria-label="close"
-        onClick={handleCloseModal}
-        sx={{ position: 'absolute', right: 8, top: 8 }}
-      >
-        <CloseIcon />
-      </IconButton>
-      <DialogContent>
-        {/* <DialogContentText>Add Your Work</DialogContentText> */}
-        <Grid container spacing={2}>
-          <Grid item xs={6} > 
-            <TextField size='small' onChange={handleInputs} value={userData.work} fullWidth variant='outlined' label='Work Name' name='work'></TextField>
+      <Dialog open={openModal} onClose={handleCloseModal}>
+        <DialogTitle>Add Work</DialogTitle>
+        <IconButton
+          aria-label="close"
+          onClick={handleCloseModal}
+          sx={{ position: 'absolute', right: 8, top: 8 }}
+        >
+          <CloseIcon />
+        </IconButton>
+        <DialogContent>
+          <Grid container spacing={2}>
+            <Grid item xs={12} sm={6}>
+              <TextField size='small' onChange={handleInputs} value={userData.work} fullWidth variant='outlined' label='Work Name' name='work'></TextField>
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField size='small' onChange={handleInputs} value={userData.workHeading} fullWidth variant='outlined' label='Work Title' name='workHeading'></TextField>
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField size='small' onChange={handleInputs} value={userData.workSpecialization} fullWidth variant='outlined' label='Work Specialization' name='workSpecialization'></TextField>
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField size='small' onChange={handleInputs} value={userData.hourlyRate} fullWidth variant='outlined' label='Hourly Rate' name='hourlyRate'></TextField>
+            </Grid>
+            <Grid item xs={12}>
+              <TextField size='small' onChange={handleInputs} fullWidth variant='outlined' value={userData.workDescription} label='Work Description' name='workDescription'></TextField>
+            </Grid>
+            <Grid item xs={12}>
+              <Button size='small' color='success' variant='contained' onClick={UserProfileWork} fullWidth >
+                Update Work Profile
+              </Button>
+            </Grid>
           </Grid>
-          <Grid item xs={6} > 
-            <TextField size='small' onChange={handleInputs} value={userData.workHeading} fullWidth variant='outlined' label='Work Title' name='workHeading'></TextField>
-          </Grid>
-          <Grid item xs={6} > 
-            <TextField size='small' onChange={handleInputs} value={userData.workSpecialization} fullWidth variant='outlined' label='Work Specialization' name='workSpecialization'></TextField>
-          </Grid>
-          <Grid item xs={6} > 
-            <TextField size='small' onChange={handleInputs} value={userData.hourlyRate} fullWidth variant='outlined' label='Hourly Rate' name='hourlyRate'></TextField>
-          </Grid>
-          <Grid item xs={12} > 
-            <TextField size='small' onChange={handleInputs} fullWidth variant='outlined' value={userData.workDescription} label='Work Description' name='workDescription'></TextField>
-          </Grid>
-          <Grid item xs={12} >
-            <Button size='small' color='success' variant='contained' onClick={UserProfileWork} fullWidth >
-              Update Work Profile
-            </Button>
-          </Grid>
-          {/* Add your content here */}
-        </Grid>
-      </DialogContent>
-    </Dialog>
-    <Container maxWidth='lg' className='p-5'>
-      <div className='shadow-lg p-3 mb-5 bg-white rounded'>
-        <Grid container spacing={0}>
-          <Grid item xs={12}>
-            <Avatar
-              sx={{
-                width: 100,
-                height: 100,
-                border: '2px solid #fff',
-              }}
-            >
-              <PersonIcon fontSize='large' />
-            </Avatar>
-            <br />
-            <h4>{userData.firstname} {userData.lastname}</h4>
+        </DialogContent>
+      </Dialog>
+      <Container maxWidth='lg' className='p-5'>
+        <div className='shadow-lg p-3 mb-5 bg-white rounded'>
+          <Grid container spacing={2}>
+            <Grid item xs={12}>
+              <Avatar
+                sx={{
+                  width: 100,
+                  height: 100,
+                  border: '2px solid #fff',
+                }}
+              >
+                <PersonIcon fontSize='large' />
+              </Avatar>
+              <br/>
+              <Typography variant="h5" component="div">
+                <strong>{`${userData.firstname} ${userData.lastname}`}</strong>
+              </Typography>
+              <div style={{ display: 'flex', alignItems: 'center' }}>
+                <LocationOnIcon style={{ color: 'lightgrey' }} />
+                <Typography>{userData.location}</Typography>
+              </div>
+              <br/>
+            </Grid>
           </Grid>
           <Divider />
-          <Grid container spacing={0}>
-            <Grid item xs={12} md={4}>
-              <List>
-              <ListItem button onClick={handleSubMenuClick}>
-                <ListItemText primary="All Work" />
-                {subMenuOpen ? <ExpandLess /> : <ExpandMore />}
-                <IconButton
-                  onClick={handleOpenModal}
-                  style={{
-                    border: '2px solid green', // Replace 'green' with your desired success color
-                    borderRadius: '50%',
-                    padding: 4, // Adjust this value as needed
-                  }}
-                >
-                  <AddIcon style={{ color: 'green' }} /> {/* Replace 'green' with your desired success color */}
-                </IconButton>
-              </ListItem>
-              
-              <Collapse in={subMenuOpen} timeout="auto" unmountOnExit>
-                <List component="div" disablePadding>
-                  {userData.UserProfileWork && userData.UserProfileWork.map((profile, index) => (
-                    <ListItem button key={index}>
-                      <ListItemText primary={profile.workHeading} />
-                    </ListItem>
-                  ))}
+          <br/>  
+        <Grid container spacing={2}>      
+          <Grid item xs={12} md={4}>
+            <Container maxWidth='sm' className='p-1' >
+              <div className='shadow-sm p-3 bg bg-white rounded'>
+                <div style={{ display: 'flex', gap: '10px',alignItems:'center' }}>
+                  <Typography>View Profile</Typography>
+                  <IconButton
+                    onClick={handleOpenModal}
+                    style={{
+                      border: '2px solid lightgrey',
+                      borderRadius: '50%',
+                      padding: 4,
+                    }}
+                    aria-label="Add Work"
+                  >
+                    <AddIcon style={{ color: 'green' }} />
+                  </IconButton>
+                  <IconButton
+                    onClick={handleOpenModal}
+                    style={{
+                      border: '2px solid lightgrey',
+                      borderRadius: '50%',
+                      padding: 4,
+                    }}
+                    aria-label="Edit Work"
+                  >
+                    <EditIcon style={{ color: 'green' }} />
+                  </IconButton>
+                </div>        
+                <List>
+                  <ListItem button onClick={handleSubMenuClick}>
+                    <ListItemText primary="All Work" />
+                    {subMenuOpen ? <ExpandLess /> : <ExpandMore />}
+                  </ListItem>
+
+                  <Collapse in={subMenuOpen} timeout="auto" unmountOnExit>
+                    <List component="div" disablePadding>
+                      {userData.UserProfileWork &&
+                        userData.UserProfileWork.map((profile, index) => (
+                          <ListItem
+                            button
+                            key={index}
+                            onClick={() => handleMenuClick(profile.work)}
+                          >
+                            <ListItemText primary={profile.workHeading} />
+                          </ListItem>
+                        ))}
+                    </List>
+                  </Collapse>
+                  <ListItem button onClick={() => handleMenuClick('menu1')}>
+                    <ListItemText primary="Menu 1" />
+                  </ListItem>
+                  <ListItem button onClick={() => handleMenuClick('menu2')}>
+                    <ListItemText primary="Menu 2" />
+                  </ListItem>
+                  <ListItem button onClick={() => handleMenuClick('menu3')}>
+                    <ListItemText primary="Menu 3" />
+                  </ListItem>
                 </List>
-              </Collapse>
-                <ListItem button onClick={() => handleMenuClick('menu1')}>
-                  <ListItemText primary="Menu 1" />
-                </ListItem>
-                <ListItem button onClick={() => handleMenuClick('menu2')}>
-                  <ListItemText primary="Menu 2" />
-                </ListItem>
-                <ListItem button onClick={() => handleMenuClick('menu3')}>
-                  <ListItemText primary="Menu 3" />
-                </ListItem>
-              </List>
-            </Grid>
+            </div>
+          </Container>  
+          </Grid>
             <Grid item xs={12} md={8}>
+            <Container maxWidth='lg' className='p-1'>
+              <div className='shadow-sm p-3 mb-5 bg-white rounded'>
               {selectedMenu === 'menu1' && (
                 <div>
                   <h2>Menu 1 Content</h2>
@@ -211,12 +245,29 @@ const handleInputs = (e) => {
                   <h2>Menu 3 Content</h2>
                 </div>
               )}
-            </Grid>
+              {selectedMenu ? (
+                  userData.UserProfileWork.map((profile) => {
+                    if (selectedMenu === profile.work) {
+                      return (
+                        <div key={profile._id}>
+                          <h2>{profile.workHeading}</h2>
+                          <p>{profile.workSpecialization}</p>
+                          {/* ... other profile data ... */}
+                        </div>
+                      );
+                    }
+                    return null; // Render nothing if the selectedMenu doesn't match the profile work
+                  })
+                ) : (
+                  <div>Please select a submenu item to view its content.</div>
+                )}
+              </div>
+            </Container>
           </Grid>
         </Grid>
-      </div>
-    </Container>
-    <ToastContainer/>
+        </div>
+      </Container>
+      <ToastContainer />
     </>
   );
 };
