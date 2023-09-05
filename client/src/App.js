@@ -15,6 +15,7 @@ import FLAppbar from './components/FLAppbar';
 import UserProfile from './components/UserProfile';
 import UserSettings from './components/UserSettings';
 import UserNavbar from './components/UserNavbar';
+import UserNavbarRes from './components/UserNavbarRes';
 
 const App = () => {
   const [userData, setUserData] = useState({});
@@ -50,7 +51,7 @@ const App = () => {
 
   return (
     <>
-    {isLoading ? null : userData.designation ? <UserNavbar /> : < Navbar/>}
+    {isLoading ? null : userData.designation ? <UserNavbar /> : < UserNavbarRes/>}
     <Routes>
       <Route exact path="/" element={<Home />} />
       <Route path="/about" element={<About />} />

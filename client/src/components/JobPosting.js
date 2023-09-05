@@ -3,7 +3,7 @@
 import React, { useState,useEffect,useRef } from 'react';
 import Container from '@mui/material/Container';
 import Grid from '@mui/material/Grid';
-import { TextField, TextareaAutosize } from '@mui/material';
+import { TextField, TextareaAutosize, Typography } from '@mui/material';
 import CircularProgress from '@mui/material/CircularProgress';
 import Button from '@mui/material/Button';
 import SendIcon from '@mui/icons-material/Send';
@@ -15,13 +15,17 @@ import { Paper, List, ListItem, ListItemText,IconButton } from '@mui/material';
 import { formatDistanceToNow } from 'date-fns';
 import InputAdornment from '@mui/material/InputAdornment';
 import SearchIcon from '@mui/icons-material/Search';
-import {Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Divider } from '@mui/material';
+import {Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Divider,Tab,Tabs } from '@mui/material';
 import Web3 from 'web3';
 import CheckIcon from '@mui/icons-material/Check';
 import BookmarkIcon from '@mui/icons-material/Bookmark';
 import FlagIcon from '@mui/icons-material/Flag';
 import Avatar from '@mui/material/Avatar';
 import PersonIcon from '@mui/icons-material/Person';
+import AccessTimeIcon from '@mui/icons-material/AccessTime';
+import EthereumIcon from '@mui/icons-material/MonetizationOn';
+import WorkIcon from '@mui/icons-material/Psychology';
+import logo from '../img/ethereumwallet.png'
 
 const JobPosting = () => {
 
@@ -220,34 +224,35 @@ const JobPosting = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const [currentDateTime, setCurrentDateTime] = useState(new Date());
-  const [userData,setUserData] = useState({});
+  const [userData,setUserData] = useState([]);
+  
 
-  const UserCall = async ()=>{
+  const UserCall = async () => {
     try {
-      const res = await fetch('/about',{
-        method:"GET",
+      const res = await fetch('/about', {
+        method: "GET",
         headers: {
-          Accept:"application/json",
-          "Content-Type":"application/json"
+          Accept: "application/json",
+          "Content-Type": "application/json"
         },
-        credentials:"include"
+        credentials: "include"
       });
       const data = await res.json();
       setUserData(data);
-      if(res.status !== 200){
+      if (res.status !== 200) {
         const error = new Error(res.error);
         throw error;
       }
-      
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
   }
+  
+  
   useEffect(() => {
     UserCall();
   },[])
 
-  
   const userid = userData.firstname;
   const [jobp,setjobp] = useState({
     job:"",skills:"",description:"",createdOn:currentDateTime,createdBy:userid,title:"",expertise:"",pricing:null,flexibility:"",estimatedtime:""
@@ -414,6 +419,14 @@ const [ethValue, setEthValue] = useState('');
   const OnProfile = () => {
     navigate('/UserProfile');
   }
+
+  const [openDialog, setOpenDialog] = useState(false);
+  const [activeTab, setActiveTab] = useState(0);  
+
+  const handleTabChange = (event, newValue) => {
+    setActiveTab(newValue);
+  };
+  
 
   return (
     <>
@@ -774,7 +787,13 @@ const [ethValue, setEthValue] = useState('');
                       <section>
                         <Grid container spacing={1} textAlign="left">
                           <Grid item xs={12}>
-                            <Button variant='contained' size='small' color='success' startIcon={<CheckIcon />}>
+                            <Button
+                              variant="contained"
+                              size="small"
+                              color="success"
+                              startIcon={<CheckIcon />}
+                              onClick={() => setOpenDialog(true)}
+                            >
                               Apply Now
                             </Button>
                           </Grid>
@@ -830,12 +849,154 @@ const [ethValue, setEthValue] = useState('');
                   </Grid>
                 </DialogContent>
                 <DialogActions>
-                  <Button onClick={handleCloseModal}>Close</Button>
+                  <Button color='success' size='small'  onClick={handleCloseModal}>Close</Button>
                 </DialogActions>
               </>
             )}
-        </Dialog>
+            </Dialog>
       )}
+          <Dialog open={openDialog} maxWidth="lg" fullWidth>
+            <DialogTitle>Apply for the Job</DialogTitle>
+            <DialogContent>        
+              <Tabs
+                  value={activeTab}
+                  onChange={handleTabChange}
+                  sx={{
+                    "& .Mui-selected": {
+                      color: '#00C853 !important', 
+                    },
+                    "& .MuiTabs-indicator": {
+                      backgroundColor: '#00C853 !important',
+                    },
+                  }}
+                >
+                <Tab label="Proposal Settings" />
+                <Tab label="Job Details" />
+                <Tab label="Additional Details" />
+                <Tab label="Terms" />
+              </Tabs>
+              {/* Content for Proposal Settings Tab */}
+              {activeTab === 0 && (         
+                <Container maxWidth='lg' className='p-3'>
+                  <div className='shadow-lg p-3 mb-5 bg-white rounded'>
+                    <Grid container spacing={2} >
+                      <Grid item xs={12}>
+                          <h5>Profile Settings</h5>
+                      </Grid>
+                      <Grid item xs={12} md={4} >
+                      {userData.UserProfileWork ? (
+                        <Autocomplete
+                          size='small'
+                          options={userData.UserProfileWork.map(profile => profile.work)}
+                          renderInput={(params) => <TextField {...params} label="Select Profile" />}
+                          name="profileWork"
+                        />
+                      ) : (
+                        null
+                      )}
+                      </Grid>
+                      <Grid item xs={12} md={12} >
+                        <p>This proposal requires <b>16 devCoins</b>.</p>
+                        <p>When you submit this proposal, you'll have <b>96 Coins</b> remaining.</p>
+                      </Grid>
+                    </Grid>
+                    
+                  </div>
+                </Container>
+              )}
+
+              {/* Content for Job Details Tab */}
+              {activeTab === 1 && (
+                <Container maxWidth='lg' className='p-3'>
+                  <div className='shadow-lg p-3 mb-5 bg-white rounded'>
+                      {selectedJob && (
+                      <Grid container spacing={2}>
+                        <Grid item xs={12}>
+                          <h5>Job Details</h5>
+                        </Grid>
+                        <Grid item xs={7} md={7} style={{ borderRight: '1px solid #ccc' }}>
+                          <h4>{selectedJob.title}</h4>
+                          <p>{selectedJob.job} Posted On: {formatDistanceToNow(new Date(selectedJob.createdOn), { addSuffix: true })}</p>
+                          <p>{selectedJob.description}</p>
+                        </Grid>
+                        <Grid item xs={5} md={5}>
+                          <p>
+                            <WorkIcon /> {selectedJob.expertise}, Experience Level
+                          </p>
+                          <p>
+                            <EthereumIcon /> Ethereum: {selectedJob.pricing}
+                          </p>
+                          <p>
+                            <AccessTimeIcon /> Time: {selectedJob.estimatedtime}
+                          </p>
+                        </Grid>
+                        
+                        <Grid item xs={12} md={12} style={{ borderTop: '1px solid #ccc' }} >
+                          <p>
+                            Skills & Expertise
+                          </p>
+                          <p>{selectedJob.skills}</p>
+                        </Grid>
+                      </Grid>
+                      
+                        )}
+                  </div>
+              </Container>
+              )}
+
+              {/* Content for Additional Details Tab */}
+              {activeTab === 2 && (
+                  <Container maxWidth='lg' className='p-3'>
+                  <div className='shadow-lg p-3 mb-5 bg-white rounded'>
+                    <Grid container spacing={2} >
+                        <Grid item xs={12} >
+                          <h5>Additional Details</h5>
+                        </Grid>
+                        <Grid item xs={12} md={12} >
+                          <TextField variant='outlined' fullWidth size='small' label='Cover Letter' multiline rows={4}/>
+                        </Grid>
+                    </Grid>
+                  </div>
+                </Container>
+              )}
+
+              {/* Content for Terms Tab */}
+              {activeTab === 3 && (
+                <Container maxWidth='lg' className='p-3'>
+                <div className='shadow-lg p-3 mb-5 bg-white rounded'>
+                  <Grid container spacing={2}>
+                    <Grid item xs={8} md={8}>
+                      <h5>Terms</h5>
+                      <h6>What is the rate you'd like to bid for this job?</h6>
+                      <p>Your Profile Rate: </p>
+                      {/* <p>Your Profile Rate: {userData.UserProfileWork(profile => profile.hourlyRate)}</p> */}
+                      <p>Client’s budget: {selectedJob.pricing} eth </p>
+                      <p>2% Freelancer Service Fee</p>
+                      <p>{selectedJob.pricing * 0.02} eth /hr</p>
+                      <p>You'll receive {selectedJob.pricing - (selectedJob.pricing * 0.02)} eth</p>
+                      <Typography>The estimated amount you'll receive after service fees</Typography>
+                    </Grid>
+                    <Grid item xs={4} md={4} >
+                      <img src={logo} width={250} alt="Logo" />
+                    </Grid>
+                  </Grid>
+                </div>
+              </Container>
+              )}
+            </DialogContent>
+            <DialogActions>
+              <Button variant='outlined' size='small' color='success' onClick={() => setOpenDialog(false)}>Cancel</Button>
+              {activeTab > 0 && (
+                <Button variant='outlined' size='small' color='success' onClick={() => setActiveTab(activeTab - 1)}>Back</Button>
+              )}
+              {activeTab < 3 && (
+                <Button variant='outlined' size='small' color='success' onClick={() => setActiveTab(activeTab + 1)}>Next</Button>
+              )}
+              {activeTab === 3 && (
+                <Button variant='contained' size='small' color='success' onClick={() => setActiveTab(activeTab + 1)}>Submit a Proposal</Button>
+              )}
+            </DialogActions>
+          </Dialog>
         </Container>
       </Grid>
       <Grid item xs={12} md={3}>

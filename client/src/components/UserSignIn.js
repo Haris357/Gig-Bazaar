@@ -31,7 +31,7 @@ const UserSignIn = () => {
         setLoading(true);
         setTimeout(() => {
           setLoading(false);
-        }, 10000);
+        }, 5000);
         e.preventDefault();
         const res = await fetch("/signIn", {
         method: "POST",  
