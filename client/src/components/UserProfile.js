@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useEffect } from 'react';
 import { Grid, Container, Divider, List, ListItem, ListItemText, Collapse, TextField, Button, Typography } from '@mui/material';
@@ -15,6 +16,8 @@ import CloseIcon from '@mui/icons-material/Close';
 import EditIcon from '@mui/icons-material/Edit';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import Skeleton from '@mui/material/Skeleton'; // Import Skeleton
+import Web3 from 'web3';
+
 
 const UserProfile = () => {
   const [userData, setUserData] = useState({
@@ -103,6 +106,41 @@ const UserProfile = () => {
     setUserData({ ...userData, [name]: value });
   }
 
+  const [ethValue, setEthValue] = useState('');
+  const [ethToUsdRate, setEthToUsdRate] = useState(null);
+
+  const handleEthChange = (event) => {
+    const input = event.target.value;
+
+    if (/^\d*\.?\d*$/.test(input)) {
+      setEthValue(input);
+    }
+  };
+
+  const fetchEthereumPrice = async () => {
+    try {
+      const web3 = new Web3('https://mainnet.infura.io/v3/YOUR_INFURA_PROJECT_ID');
+      const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd');
+      const data = await response.json();
+      const ethPriceInUSD = data.ethereum.usd;
+      setEthToUsdRate(ethPriceInUSD);
+    } catch (error) {
+      console.error('Error fetching Ethereum price:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchEthereumPrice();
+  }, []);
+
+  const calculateUsdValue = () => {
+    const ethAmount = parseFloat(ethValue);
+    if (!isNaN(ethAmount) && ethToUsdRate !== null) {
+      return (ethAmount * ethToUsdRate).toFixed(2);
+    }
+    return '';
+  };
+
   return (
     <>
       <Dialog open={openModal} onClose={handleCloseModal}>
@@ -126,7 +164,31 @@ const UserProfile = () => {
               <TextField size='small' onChange={handleInputs} value={userData.workSpecialization} fullWidth variant='outlined' label='Work Specialization' name='workSpecialization'></TextField>
             </Grid>
             <Grid item xs={12} sm={6}>
-              <TextField size='small' onChange={handleInputs} value={userData.hourlyRate} fullWidth variant='outlined' label='Hourly Rate' name='hourlyRate'></TextField>
+            <div>
+              <TextField
+                label="Hourly Rate"
+                size='small'
+                fullWidth
+                value={ethValue && userData.hourlyRate}
+                name="hourlyRate"
+                onChange={(event) => {
+                  handleEthChange(event);
+                  handleInputs(event);
+                }}
+                InputProps={{
+                  inputProps: {
+                    pattern: /^\d*\.?\d*$/,
+                  },
+                }}
+              />
+              <div>
+                {ethValue && ethToUsdRate !== null && (
+                  <p>
+                    {ethValue} Ethereum is approximately ${calculateUsdValue()} USD
+                  </p>
+                )}
+              </div>
+            </div>
             </Grid>
             <Grid item xs={12}>
               <TextField size='small' onChange={handleInputs} fullWidth variant='outlined' value={userData.workDescription} label='Work Description' name='workDescription'></TextField>

@@ -13,7 +13,7 @@ require('../db/conn');
 
 //model
 const DevUser = require("../model/devusersSchema");
-const DevJob = require('../model/devjobpostingschema');
+const DevJob = require("../model/devjobpostingschema");
 
 //Javascript promising
 
@@ -190,6 +190,23 @@ router.post('/UserProfileWork',authenticate,async(req,res)=>{
           } 
      } catch (error) {
           console.log(error);
+     }
+})
+//Proposals
+router.post('/Proposals',authenticate,async(req,res)=>{
+     try {
+          const { proposalById, proposalByName, profileWork, hourlyRate, coverLetter, proposalOn } = req.body;
+          // if(!proposalById || !proposalByName || !profileWork || !hourlyRate || !coverLetter || !proposalOn){
+          //      console.log("error in Proposal");
+          //      return res.json({error:"please fill the proposal"})
+          // }
+          const Proposals = await Proposals.addProposals(proposalById, proposalByName, profileWork, hourlyRate, coverLetter, proposalOn);
+          await Proposals.save();
+          console.log("error in Proposal");
+          res.status(201).json({message: "Proposal Send Successfully"})
+          
+     } catch (error) {
+          
      }
 })
    
