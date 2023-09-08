@@ -8,8 +8,5 @@
     "not and_ff <= 115",
     "not firefox <= 115",
     "not opera <= 100"
-  ],
-  "hints": {
-    "axe/language": "off"
-  }
+  ]
 }
