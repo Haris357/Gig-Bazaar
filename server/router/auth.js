@@ -14,7 +14,8 @@ require('../db/conn');
 //model
 const DevUser = require("../model/devusersSchema");
 const DevJob = require("../model/devjobpostingschema");
-
+const DevProps = require("../model/devproposalsSchema");
+const DevProf = require("../model/devuserprofileSchema");
 //Javascript promising
 
 // router.post('/register', async  (req,res) => {
@@ -58,6 +59,55 @@ const DevJob = require("../model/devjobpostingschema");
           console.log(err);
      }
  });
+ //Proposals
+router.post('/Proposals', async (req,res) => {
+     const {proposalById,profileWork,hourlyRate,coverLetter,proposalOn,jobID,jobByID} = req.body;
+     if( !proposalById || !profileWork  || !hourlyRate || !coverLetter || !proposalOn || !jobByID || !jobID){
+          return res.status(422).json({error: "Please Add Missing Fields"});
+     }
+     try {
+          const props = new DevProps({proposalById,profileWork,hourlyRate,coverLetter,proposalOn,jobID,jobByID});
+          await props.save();
+          res.status(201).json({message: "Proposal Submitted Successfully"});
+     } catch (error) {
+          console.log(err);
+     }
+ });
+ //UserProfile
+ router.post('/UserProfileWork', async (req,res) => {
+     const {work, workHeading, workSpecialization, hourlyRate, workDescription,userID} = req.body;
+          if(!work || !workHeading || !workSpecialization || !hourlyRate || !workDescription || !userID){
+               console.log("error in User Profile");
+               return res.json({error:"please fill the userprofile"})
+          }
+     try {
+          const prof = new DevProf({work, workHeading, workSpecialization, hourlyRate, workDescription,userID});
+          await prof.save();
+          res.status(201).json({message: "Work Specialized Added"});
+
+     } catch (error) {
+          console.log(error);
+     }
+})
+
+//GetUserProfileWork
+router.get('/GetUserProfileWork/:userID', async (req, res) => {
+     try {
+       const { userID } = req.params;
+       
+       // Find user profile work data matching the userID
+       const userProfileWork = await DevProf.find({ userID });
+   
+       if (!userProfileWork) {
+         return res.status(404).json({ error: 'User profile work data not found' });
+       }
+   
+       res.status(200).json(userProfileWork);
+     } catch (error) {
+       console.error(error);
+       res.status(500).json({ error: 'Internal server error' });
+     }
+   });
 
  //Login
  router.post('/signIn', async (req,res)=>{
@@ -114,9 +164,9 @@ const DevJob = require("../model/devjobpostingschema");
 
  //jobposting
  router.post('/jobposting',authenticate,upload.single('file'),async (req,res)=>{
-     const {job,skills,description,createdOn,createdBy,title,expertise,pricing,flexibility,estimatedtime} = req.body;
+     const {job,skills,description,createdOn,createdBy,title,expertise,pricing,flexibility,estimatedtime,createdByID} = req.body;
      
-     if( !job || !skills || !description || !createdOn || !createdBy || !title || !expertise || !pricing || !flexibility || !estimatedtime ) {
+     if( !job || !skills || !description || !createdOn || !createdBy || !title || !expertise || !pricing || !flexibility || !estimatedtime || !createdByID ) {
          return res.status(422).json({error: "Please Add Missing Fields"});
      }
      try {
@@ -135,6 +185,7 @@ const DevJob = require("../model/devjobpostingschema");
             description,
             createdOn,
             createdBy,
+            createdByID,
             title,
             expertise,
             pricing,
@@ -174,40 +225,6 @@ router.get('/logout', (req, res) => {
      res.clearCookie('jwtoken', { path: '/' });
      res.status(200).send('User Logout');
    });
-//UserProfileWork   
-router.post('/UserProfileWork',authenticate,async(req,res)=>{
-     try {
-          const {work, workHeading, workSpecialization, hourlyRate, workDescription, _id, firstname, designation} = req.body;
-          if(!work || !workHeading || !workSpecialization || !hourlyRate || !workDescription || !_id || !firstname || !designation){
-               console.log("error in User Profile");
-               return res.json({error:"please fill the userprofile"})
-          }
-          const UserProfileWork = await DevUser.findOne({_id: req.userID});
-          if(UserProfileWork){
-               const userProfile = await UserProfileWork.addUserProfileWork(work, workHeading, workSpecialization, hourlyRate, workDescription, _id, firstname, designation);
-               await UserProfileWork.save();
-               res.status(201).json({message: "User Profile Updated Successfully"});
-          } 
-     } catch (error) {
-          console.log(error);
-     }
-})
-//Proposals
-router.post('/Proposals',authenticate,async(req,res)=>{
-     try {
-          const { proposalById, proposalByName, profileWork, hourlyRate, coverLetter, proposalOn } = req.body;
-          // if(!proposalById || !proposalByName || !profileWork || !hourlyRate || !coverLetter || !proposalOn){
-          //      console.log("error in Proposal");
-          //      return res.json({error:"please fill the proposal"})
-          // }
-          const Proposals = await Proposals.addProposals(proposalById, proposalByName, profileWork, hourlyRate, coverLetter, proposalOn);
-          await Proposals.save();
-          console.log("error in Proposal");
-          res.status(201).json({message: "Proposal Send Successfully"})
-          
-     } catch (error) {
-          
-     }
-})
+
    
 module.exports = router;

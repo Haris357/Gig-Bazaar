@@ -20,21 +20,12 @@ import Web3 from 'web3';
 
 
 const UserProfile = () => {
-  const [userData, setUserData] = useState({
-    work: '',
-    workHeading: '',
-    workSpecialization: '',
-    hourlyRate: '',
-    workDescription: '',
-    firstname: '',
-    _id: '',
-    designation: '',
-  });
+  const [userData, setUserData] = useState({});
 
   const [selectedMenu, setSelectedMenu] = useState(null);
   const [subMenuOpen, setSubMenuOpen] = useState(false);
   const [openModal, setOpenModal] = useState(false);
-  const [isLoading, setIsLoading] = useState(true); // Loading state
+  const [isLoading, setIsLoading] = useState(true);
 
   const UserCall = async () => {
     try {
@@ -61,28 +52,61 @@ const UserProfile = () => {
   useEffect(() => {
     UserCall();
   }, []);
-
+  const [userWork,setUserWork] = useState({ 
+    work: '',
+    workHeading: '',
+    workSpecialization: '',
+    hourlyRate: '',
+    workDescription: '',
+    userID:'',
+  });
   const UserProfileWork = async (e) => {
     e.preventDefault();
-    const { work, workHeading, workSpecialization, hourlyRate, workDescription, firstname, _id, designation } = userData;
+    const updatedUserWork = { ...userWork, userID: userData._id };
+  
+    const { work, workHeading, workSpecialization, hourlyRate, workDescription } = updatedUserWork;
+  
     const res = await fetch('/UserProfileWork', {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        work, workHeading, workSpecialization, hourlyRate, workDescription, _id, firstname, designation
+        work, workHeading, workSpecialization, hourlyRate, workDescription, userID: updatedUserWork.userID
       })
     })
-
+  
     const data = await res.json();
     if (!data) {
-      toast.error('something went wrong');
+      toast.error('Something went wrong');
     } else {
-      toast.success('User Profile Work Updated Successfully')
-      setUserData({ ...userData, work: "", workHeading: "", workSpecialization: "", hourlyRate: "", workDescription: "" })
+      toast.success('User Profile Work Updated Successfully');
+      setUserWork({ ...updatedUserWork, work: "", workHeading: "", workSpecialization: "", hourlyRate: "", workDescription: "" });
     }
   }
+  
+  const [userProfileData, setUserProfileData] = useState([]);
+
+  const fetchUserProfileWorkData = async () => {
+    try {
+      if (!userData || !userData._id) {
+        return;
+      }
+      const response = await fetch(`/GetUserProfileWork/${userData._id}`);
+      const data = await response.json();
+      if (!response.ok) {
+        console.error('Error fetching user profile work data');
+      } else {
+        setUserProfileData(data);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    fetchUserProfileWorkData();
+  }, [userData]);
 
   const handleMenuClick = (menu) => {
     setSelectedMenu(menu);
@@ -103,7 +127,7 @@ const UserProfile = () => {
   const handleInputs = (e) => {
     const name = e.target.name;
     const value = e.target.value;
-    setUserData({ ...userData, [name]: value });
+    setUserWork({ ...userWork, [name]: value });
   }
 
   const [ethValue, setEthValue] = useState('');
@@ -141,6 +165,12 @@ const UserProfile = () => {
     return '';
   };
 
+  const [selectedUserProfile, setSelectedUserProfile] = useState(null);
+
+  const handleUserProfileDataClick = (item) => {
+    setSelectedUserProfile(item);
+  };
+
   return (
     <>
       <Dialog open={openModal} onClose={handleCloseModal}>
@@ -155,13 +185,13 @@ const UserProfile = () => {
         <DialogContent>
           <Grid container spacing={2}>
             <Grid item xs={12} sm={6}>
-              <TextField size='small' onChange={handleInputs} value={userData.work} fullWidth variant='outlined' label='Work Name' name='work'></TextField>
+              <TextField size='small' onChange={handleInputs} value={userWork.work} fullWidth variant='outlined' label='Work Name' name='work'></TextField>
             </Grid>
             <Grid item xs={12} sm={6}>
-              <TextField size='small' onChange={handleInputs} value={userData.workHeading} fullWidth variant='outlined' label='Work Title' name='workHeading'></TextField>
+              <TextField size='small' onChange={handleInputs} value={userWork.workHeading} fullWidth variant='outlined' label='Work Title' name='workHeading'></TextField>
             </Grid>
             <Grid item xs={12} sm={6}>
-              <TextField size='small' onChange={handleInputs} value={userData.workSpecialization} fullWidth variant='outlined' label='Work Specialization' name='workSpecialization'></TextField>
+              <TextField size='small' onChange={handleInputs} value={userWork.workSpecialization} fullWidth variant='outlined' label='Work Specialization' name='workSpecialization'></TextField>
             </Grid>
             <Grid item xs={12} sm={6}>
             <div>
@@ -169,7 +199,7 @@ const UserProfile = () => {
                 label="Hourly Rate"
                 size='small'
                 fullWidth
-                value={ethValue && userData.hourlyRate}
+                value={ethValue && userWork.hourlyRate}
                 name="hourlyRate"
                 onChange={(event) => {
                   handleEthChange(event);
@@ -191,7 +221,7 @@ const UserProfile = () => {
             </div>
             </Grid>
             <Grid item xs={12}>
-              <TextField size='small' onChange={handleInputs} fullWidth variant='outlined' value={userData.workDescription} label='Work Description' name='workDescription'></TextField>
+              <TextField size='small' onChange={handleInputs} fullWidth variant='outlined' value={userWork.workDescription} label='Work Description' name='workDescription'></TextField>
             </Grid>
             <Grid item xs={12}>
               <Button size='small' color='success' variant='contained' onClick={UserProfileWork} fullWidth >
@@ -273,21 +303,24 @@ const UserProfile = () => {
                         <ListItemText primary="All Work" />
                         {subMenuOpen ? <ExpandLess /> : <ExpandMore />}
                       </ListItem>
-
-                      <Collapse in={subMenuOpen} timeout="auto" unmountOnExit>
-                        <List component="div" disablePadding>
-                          {userData.UserProfileWork &&
-                            userData.UserProfileWork.map((profile, index) => (
+                      {Array.isArray(userProfileData) && userProfileData.length > 0 ? (
+                        <Collapse in={subMenuOpen} timeout="auto" unmountOnExit>
+                          <List component="div" disablePadding>
+                            {userProfileData.map((item) => (
                               <ListItem
+                                key={item._id}
                                 button
-                                key={index}
-                                onClick={() => handleMenuClick(profile.work)}
+                                onClick={() => {
+                                  handleUserProfileDataClick(item);
+                                  setSelectedMenu(item.work);
+                                }}
                               >
-                                <ListItemText primary={profile.workHeading} />
+                                <ListItemText primary={item.work} />
                               </ListItem>
                             ))}
-                        </List>
-                      </Collapse>
+                          </List>
+                        </Collapse>
+                      ) : null}
                       <ListItem button onClick={() => handleMenuClick('menu1')}>
                         <ListItemText primary="Menu 1" />
                       </ListItem>
@@ -328,21 +361,10 @@ const UserProfile = () => {
                           <h2>Menu 3 Content</h2>
                         </div>
                       )}
-                      {selectedMenu ? (
-                        userData.UserProfileWork.map((profile) => {
-                          if (selectedMenu === profile.work) {
-                            return (
-                              <div key={profile._id}>
-                                <h2>{profile.workHeading}</h2>
-                                <p>{profile.workSpecialization}</p>
-                                {/* ... other profile data ... */}
-                              </div>
-                            );
-                          }
-                          return null; // Render nothing if the selectedMenu doesn't match the profile work
-                        })
-                      ) : (
-                        <div>Please select a submenu item to view its content.</div>
+                     {selectedUserProfile && selectedMenu === selectedUserProfile.work && (
+                        <div>
+                          <h2>{selectedUserProfile.workHeading}</h2>
+                        </div>
                       )}
                     </>
                   )}

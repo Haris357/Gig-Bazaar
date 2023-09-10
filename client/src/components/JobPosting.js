@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable no-use-before-define */
 /* eslint-disable no-unused-vars */
 import React, { useState,useEffect,useRef } from 'react';
@@ -224,7 +225,7 @@ const JobPosting = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const [currentDateTime, setCurrentDateTime] = useState(new Date());
-  const [userData,setUserData] = useState([]);
+  const [userData,setUserData] = useState({});
   
 
   const UserCall = async () => {
@@ -256,13 +257,14 @@ const JobPosting = () => {
   const userid = userData.firstname;
   const usersid = userData._id;
   const [jobp,setjobp] = useState({
-    job:"",skills:"",description:"",createdOn:currentDateTime,createdBy:userid,title:"",expertise:"",pricing:null,flexibility:"",estimatedtime:""
+    job:"",skills:"",description:"",createdOn:currentDateTime,createdByID:usersid,createdBy:userid,title:"",expertise:"",pricing:null,flexibility:"",estimatedtime:""
   });
 
   useEffect(() => {
     setjobp((prevJobp) => ({
       ...prevJobp,
       createdBy: userData.firstname,
+      createdByID: userData._id,
     }));
   }, [userData]);
 
@@ -282,6 +284,7 @@ const JobPosting = () => {
     formData.append('pricing', jobp.pricing);
     formData.append('flexibility', jobp.flexibility);
     formData.append('estimatedtime',jobp.estimatedtime);
+    formData.append('createdByID',jobp.createdByID);
 
   
     try {
@@ -306,8 +309,6 @@ const JobPosting = () => {
     setLoading(false);
   };
   
-  
-
   const [jobPostings, setJobPostings] = useState([]);
 
   const fetchJobPostings = async () => {
@@ -355,9 +356,7 @@ const JobPosting = () => {
   const handleAutocompleteChangeest = (_,newValue) => {
     handleInputs({target: {name:"estimatedtime",value:newValue}});
   }
-  const handleAutocompleteChangePf = (_,newValue) => {
-    handleInputs({target: {name:"profileWork",value:newValue}});
-  }
+  
 
   const [searchTerm, setSearchTerm] = useState('');
   const [openModal, setOpenModal] = useState(false);
@@ -426,91 +425,85 @@ const [ethValue, setEthValue] = useState('');
 
   const [openDialog, setOpenDialog] = useState(false);
   const [activeTab, setActiveTab] = useState(0);  
-  const [selectedProfile, setSelectedProfile] = useState('');
+  const [selectedProfile, setSelectedProfile] = useState(null);
 
   const handleTabChange = (event, newValue) => {
     setActiveTab(newValue);
   };
+  const [userProfileData, setUserProfileData] = useState([]);
 
-  const [formData, setFormData] = useState({
-    profileWork: '',
-    coverLetter: '',
-  });
-  
-  useEffect(() => {
-  }, [activeTab, formData]);
-
-  const handleFormDataChange = (name, value) => {
-    if (name === 'profileWork') {
-      const selectedWork = userData.UserProfileWork.find((profile) => profile.work === value);
-      if (selectedWork) {
-        setFormData({
-          ...formData,
-          profileWork: value,
-          hourlyRate: selectedWork.hourlyRate,
-        });
-      }
-    } else {
-      setFormData({
-        ...formData,
-        [name]: value,
-      });
-    }
-  };
-  
-  const resetFormData = () => {
-    setFormData({
-      profileWork: '',
-      coverLetter: '',
-    });
-  };
-  const addDataAsObject = () => {
-    const newData = {
-      proposalById: '',
-      proposalByName: '',
-      profileWork: '',
-      hourlyRate: '',
-      coverLetter: '',
-      proposalOn: '',
-    };
-    setJobPostings(newData); 
-  };
-  
-  const Proposals = async (e) => {
-    e.preventDefault();
-    const { proposalById, proposalByName, profileWork, hourlyRate, coverLetter, proposalOn } = jobPostings;
-  
+  const fetchUserProfileWorkData = async () => {
     try {
-      const res = await fetch('/Proposals', {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(jobPostings) // Send the entire jobPostings object
-      });
-  
-      if (!res.ok) {
-        throw new Error("Network response was not ok");
+      if (!userData || !userData._id) {
+        return;
       }
-  
-      const data = await res.json();
-      toast.success('Proposal Sent Successfully');
-      
-      // Clear the form or reset the jobPostings object
-      setJobPostings({
-        proposalById: usersid,
-        proposalByName: userid,
-        profileWork: "",
-        hourlyRate: "",
-        coverLetter: "",
-        proposalOn: currentDateTime
-      });
+      const response = await fetch(`/GetUserProfileWork/${userData._id}`);
+      const data = await response.json();
+      if (!response.ok) {
+        console.error('Error fetching user profile work data');
+      } else {
+        setUserProfileData(data);
+      }
     } catch (error) {
-      console.error("Error:", error);
-      toast.error('Something went wrong');
+      console.error(error);
     }
   };
+  useEffect(() => {
+    fetchUserProfileWorkData();
+  }, [userData]);
+
+  const workOptions = userProfileData.map((item) => item.work);
+  const [selectedHourlyRate, setSelectedHourlyRate] = useState(null);
+  const findHourlyRateByWork = (selectedWork) => {
+    const selectedProfile = userProfileData.find((item) => item.work === selectedWork);
+    return selectedProfile ? selectedProfile.hourlyRate : null;
+  };
+  const [proposal,setProposal] = useState({ 
+    proposalById:'',profileWork:'',hourlyRate:'',coverLetter:'',proposalOn:currentDateTime,jobID:'',jobByID:''
+  });
+  const Proposal = async (e) => {
+    e.preventDefault();
+    console.log(selectedJob)
+    const updatedProfile = { ...proposal, proposalById: userData._id, jobID:selectedJob._id,jobByID:selectedJob.createdByID };
   
+    const { profileWork,hourlyRate,coverLetter,proposalOn } = updatedProfile;
+  
+    const res = await fetch('/Proposals', {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        profileWork,hourlyRate,coverLetter,proposalOn,proposalById:updatedProfile.proposalById,jobID:updatedProfile.jobID,jobByID:updatedProfile.jobByID
+      })
+    })
+  
+    const data = await res.json();
+    if (!data) {
+      toast.error('Something went wrong');
+    } else {
+      toast.success('User Profile Work Updated Successfully');
+      setProposal({ ...updatedProfile,profileWork:"",hourlyRate:"",coverLetter:"",proposalOn:"" });
+    }
+  }
+
+  const handleInputsProposals = (event) => {
+    const { name, value } = event.target;
+    setProposal((prevUser) => ({
+      ...prevUser,
+      [name]: value,
+    }));
+  };
+  
+  const handleAutocompleteChangePf = (_,newValue) => {
+    handleInputsProposals({target: {name:"profileWork",value:newValue}});
+  }
+  const countWords = (text) => {
+    const words = text.trim().split(/\s+/);
+    return words.length;
+  };
+
+  const wordCount = countWords(proposal.coverLetter);
 
   return (
     <>
@@ -965,24 +958,23 @@ const [ethValue, setEthValue] = useState('');
                           <h5>Profile Settings</h5>
                       </Grid>
                       <Grid item xs={12} md={4} >
-                      {userData.UserProfileWork ? (
+                      
                       <Autocomplete
-                      size='small'
-                      options={userData.UserProfileWork ? userData.UserProfileWork.map(profile => profile.work) : []}
-                      renderInput={(params) => <TextField {...params} label="Select Profile" />}
-                      name="profileWork"
-                      value={selectedProfile || null}
-                      onChange={(event, newValue) => {
-                        setSelectedProfile(newValue);
-                        handleFormDataChange('profileWork', newValue);
-                        handleAutocompleteChangePf(newValue);
-                      }}
-                    />
-                    
-                     
-                      ) : (
-                        null
-                      )}
+                        size='small'
+                        options={workOptions}
+                        renderInput={(params) => <TextField {...params} label="Select Profile" />}
+                        name="profileWork"
+                        value={proposal.profileWork}
+                        onChange={(_, newValue) => {
+                          setProposal((prevUser) => ({
+                            ...prevUser,
+                            profileWork: newValue,
+                          }));
+                      
+                          setSelectedProfile(newValue);
+                          setSelectedHourlyRate(findHourlyRateByWork(newValue));
+                        }}
+                      />  
                       </Grid>
                       <Grid item xs={12} md={12} >
                         <p>This proposal requires <b>16 devCoins</b>.</p>
@@ -1042,8 +1034,27 @@ const [ethValue, setEthValue] = useState('');
                           <h5>Additional Details</h5>
                         </Grid>
                         <Grid item xs={12} md={12} >
-                          <TextField variant='outlined' fullWidth size='small' label='Cover Letter' multiline rows={4}
-                           value={formData.coverLetter} onChange={(e) => handleFormDataChange('coverLetter', e.target.value)}  />
+                          <div>
+                            <TextField
+                              variant='outlined'
+                              fullWidth
+                              name='coverLetter'
+                              value={proposal.coverLetter}
+                              onChange={handleInputsProposals}
+                              size='small'
+                              label='Cover Letter'
+                              multiline
+                              rows={4}
+                            />
+                            <Typography variant="body2" color={wordCount < 10 ? 'error' : 'initial'}>
+                              Word Count: {wordCount}
+                            </Typography>
+                            {wordCount < 100 && (
+                              <Typography variant="body2" color="error">
+                                Minimum word count not met (10 words required).
+                              </Typography>
+                            )}
+                          </div>
                         </Grid>
                     </Grid>
                   </div>
@@ -1058,15 +1069,17 @@ const [ethValue, setEthValue] = useState('');
                     <Grid item xs={8} md={8}>
                       <h5>Terms</h5>
                       <h6>What is the rate you'd like to bid for this job?</h6>
-                      <p>Your Profile Rate: {formData.hourlyRate} eth</p>
+                      {selectedProfile && (
+                        <p>Your Profile Rate: {selectedHourlyRate}</p>
+                      )}
                       <p>Bid Hourly Rate</p>
                       <TextField
                         label='Hourly Rate'
                         size='small'
                         variant='outlined'
                         name='hourlyRate'
-                        value={formData.hourlyRate && jobPostings.hourlyRate}
-                        onChange={handleInputs}
+                        value={proposal.hourlyRate}
+                        onChange={handleInputsProposals}
                       />
                       <p>Client’s budget: {selectedJob.pricing} eth </p>
                       <p>2% Freelancer Service Fee {selectedJob.pricing * 0.02} eth /hr</p>
@@ -1088,7 +1101,6 @@ const [ethValue, setEthValue] = useState('');
                 color='success'
                 onClick={() => {
                   setOpenDialog(false);
-                  resetFormData();
                 }}
               >
                 Cancel
@@ -1100,7 +1112,7 @@ const [ethValue, setEthValue] = useState('');
                 <Button variant='outlined' size='small' color='success' onClick={() => setActiveTab(activeTab + 1)}>Next</Button>
               )}
               {activeTab === 3 && (
-                <Button variant='contained' size='small' color='success' onClick={Proposals}>Submit a Proposal</Button>
+                <Button variant='contained' size='small' onClick={Proposal} color='success'>Submit Proposal</Button>
               )}
             </DialogActions>
           </Dialog>

@@ -16,6 +16,7 @@ import UserProfile from './components/UserProfile';
 import UserSettings from './components/UserSettings';
 import UserNavbar from './components/UserNavbar';
 import UserNavbarRes from './components/UserNavbarRes';
+import Proposals from './components/Proposals.js';
 
 const App = () => {
   const [userData, setUserData] = useState({});
@@ -63,6 +64,7 @@ const App = () => {
       <Route path="/UserSignOut" element={<UserSignOut />} />
       <Route path="/UserProfile" element={<UserProfile />} />
       <Route path="/UserSettings" element={<UserSettings />} />
+      <Route path="/Proposals" element={<Proposals />} />
     </Routes>
     </>
   )
