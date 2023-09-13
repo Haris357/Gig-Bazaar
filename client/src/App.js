@@ -3,7 +3,6 @@ import React,{useState,useEffect} from 'react'
 import Navbar from './components/Navbar';
 import { Routes, Route } from 'react-router-dom';
 import Home from './components/Home';
-import About from './components/About';
 import Contact from './components/Contact';
 import ErrorPage from './components/ErrorPage';
 import "./App.css";
@@ -52,10 +51,9 @@ const App = () => {
 
   return (
     <>
-    {isLoading ? null : userData.designation ? <UserNavbar /> : < UserNavbarRes/>}
+    {isLoading ? null : userData.designation ? < UserNavbar/> : < Navbar/>}
     <Routes>
       <Route exact path="/" element={<Home />} />
-      <Route path="/about" element={<About />} />
       <Route path="/contact" element={<Contact />} />
       <Route path="/UserSignIn" element={<UserSignIn />} />
       <Route path="/*" element={<ErrorPage />} />

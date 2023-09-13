@@ -27,6 +27,10 @@ import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import EthereumIcon from '@mui/icons-material/MonetizationOn';
 import WorkIcon from '@mui/icons-material/Psychology';
 import logo from '../img/ethereumwallet.png'
+import CloseIcon from '@mui/icons-material/Close';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import AddIcon from '@mui/icons-material/Add';
 
 const JobPosting = () => {
 
@@ -300,6 +304,7 @@ const JobPosting = () => {
       } else {
         setJobPostings([...jobPostings, jobp]);
         toast.success('Job Posted Successfully');
+        setjobp('');
       }
     } catch (error) {
       console.error('Error posting job:', error);
@@ -505,137 +510,89 @@ const [ethValue, setEthValue] = useState('');
 
   const wordCount = countWords(proposal.coverLetter);
 
+  const [Jobopen, setJobOpen] = useState(false);
+  const [JobactiveTab, setJobActiveTab] = useState(0);
+
+  const handleJobOpen = () => {
+    setJobOpen(true);
+  };
+
+  const handleJobClose = () => {
+    setJobOpen(false);
+    setJobActiveTab(0);
+    setjobp('');
+  };
+
+  const handleJobTabChange = (event, newValue) => {
+    setJobActiveTab(newValue);
+  };
+
+  const handleJobNext = () => {
+    setJobActiveTab((prevTab) => prevTab + 1);
+  };
+
+  const handleJobBack = () => {
+    setJobActiveTab((prevTab) => prevTab - 1);
+  };
   return (
     <>
     <Grid container spacing={0}>
       {userData.designation === 'Client' &&(
         <Grid item xs={12}>
-        <Container maxWidth='xl' className='p-5'>
-        <div className='shadow-lg p-3  bg bg-white rounded'>
-            <div className='row'>
-              <div className='col'>
-                <Grid container spacing={3}>
-                  <Grid item xs={6} >
-                    <TextField variant='outlined' name='title' onChange={handleInputs} value={jobp.title} fullWidth size='small' label='Job Title' />
+        <Container maxWidth='xl' className='p-3'>
+        <div>
+          <Dialog open={Jobopen} fullWidth maxWidth="lg">
+          <Grid container spacing={0}>
+            <Grid item xs={11} md={11}>
+              <DialogTitle>
+                Post a Job
+              </DialogTitle>
+            </Grid>
+            <Grid item xs={1} md={1} style={{ textAlign: 'right' }}>
+              <IconButton onClick={handleJobClose}>
+                <CloseIcon />
+              </IconButton>
+            </Grid>
+          </Grid>
+            <DialogContent>
+              <Tabs
+                  value={JobactiveTab}
+                  onChange={handleJobTabChange}
+                  sx={{
+                    "& .Mui-selected": {
+                      color: '#00C853 !important', 
+                    },
+                    "& .MuiTabs-indicator": {
+                      backgroundColor: '#00C853 !important',
+                    },
+                  }}
+              >
+                <Tab label="Job Details" />
+                <Tab label="Job Skills" />
+                <Tab label="Additional Details" />
+                <Tab label="Job Pricing" />
+              </Tabs>
+              <Container className='p-4' >
+              {JobactiveTab === 0 && 
+              <Grid container spacing={3}>
+                  <Grid item xs={6} md={12} >
+                  <TextField variant='outlined' name='title' onChange={handleInputs} value={jobp.title} fullWidth size='small' label='Job Title' />
                   </Grid>
-                  <Grid item xs={6} >
-                  <Autocomplete
-                    size='small' 
-                    options={[
-                      "Beginner",
-                      "Intermediate",
-                      "Expert"
-                    ]}
-                    renderInput={(params) => <TextField {...params} label="Select Expertise" />}
-                    name="expertise"
-                    value={jobp.expertise || null}
-                    onChange={handleAutocompleteChange}
-                  />
-                  </Grid>
-                  <Grid item xs={6}>
-                    <Autocomplete
-                      size='small'
-                      options={[
-                        "Writing & Content",
-                        "Graphic Design & Multimedia",
-                        "Programming & Development",
-                        "Digital Marketing",
-                        "Administrative Support",
-                        "Translation & Languages",
-                        "Sales & Marketing",
-                        "Engineering & Architecture",
-                        "Legal Services",
-                        "Finance & Accounting",
-                        "Data Science & Analytics",
-                        "Video & Animation",
-                        "Music & Audio",
-                        "Consulting & Coaching",
-                        "Healthcare & Wellness"
-                      ]}
-                      renderInput={(params) => <TextField {...params} label="Select Job" />}
-                      value={jobp.job || null}
-                      onChange={(event, value) => {
-                        if (value) {
-                          setjobp((prevJobp) => ({
-                            ...prevJobp,
-                            job: value,
-                            skills: null,
-                          }));
-                        }
-                      }}
-                    />
-                  </Grid>
-                  <Grid item xs={6}>
-                    {jobp.job && (
-                      <Autocomplete
-                        size='small'
-                        options={jobSkills[jobp.job] || []}
-                        renderInput={(params) => <TextField {...params} label='Skills' variant='outlined' />}
-                        value={jobp.skills || null}
-                        onChange={(event, value) => {
-                          setjobp((prevJobp) => ({
-                            ...prevJobp,
-                            skills: value,
-                          }));
-                        }}
-                        disabled={!jobp.job}
-                      />
-                    )}
-                  </Grid>
-                  <Grid item xs={12}>
-                      <TextareaAutosize
-                      placeholder='Description'
-                      style={{
-                          width: '100%',
-                          padding: '0.5rem',
-                          fontSize: '1rem',
-                          borderRadius: '4px',
-                          
-                      }}
-                      value={jobp.description} name='description' onChange={handleInputs}
-                      />
-                  </Grid>
-                  <Grid item xs={4} >
-                  <div>
-                      <TextField
-                        label="Pricing"
-                        size='small'
-                        fullWidth
-                        value={ethValue && jobp.pricing}
-                        name="pricing"
-                        onChange={(event) => {
-                          handleEthChange(event);
-                          handleInputs(event);
-                        }}
-                        InputProps={{
-                          inputProps: {
-                            pattern: /^\d*\.?\d*$/,
-                          },
-                        }}
-                      />
-                      <div>
-                        {ethValue && ethToUsdRate !== null && (
-                          <p>
-                            {ethValue} Ethereum is approximately ${calculateUsdValue()} USD
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                  </Grid>
-                  <Grid item xs={4} >
-                    <Autocomplete
-                    size='small'
-                    options={[
-                      "Fixed Price",
-                      "Negotiable"
-                    ]}
-                    renderInput={(params) => <TextField {...params} label="Price Flexibility" />}
-                    name="flexibility"
-                    value={jobp.flexibility || null}
-                    onChange={handleAutocompleteChangeflex}
-                    />
-                  </Grid>
-                  <Grid item xs={4} >
+                <Grid item xs={6} md={12} >
+                <Autocomplete
+                  size='small' 
+                  options={[
+                    "Beginner",
+                    "Intermediate",
+                    "Expert"
+                  ]}
+                  renderInput={(params) => <TextField {...params} label="Select Expertise" />}
+                  name="expertise"
+                  value={jobp.expertise || null}
+                  onChange={handleAutocompleteChange}
+                />
+                </Grid>
+                <Grid item xs={6} md={12} >
                   <Autocomplete
                   size='small'
                   options={[
@@ -654,491 +611,717 @@ const [ethValue, setEthValue] = useState('');
                   value={jobp.estimatedtime || null}
                   onChange={handleAutocompleteChangeest}
                   />
-                  </Grid>
-                  <Grid item xs={4}>
-                    <input
-                      type="file"
-                      accept=".png,.pdf,.doc,.docx"
-                      onChange={handleFileChange}
-                      style={{ visibility: 'hidden', width: '1px' }}
-                      ref={fileInputRef}
-                    />
-                    <Button
-                      variant="outlined"
-                      color="primary"
-                      onClick={() => fileInputRef.current.click()}
-                    >
-                      Attach File
-                    </Button>
-                    {selectedFile && <p>Attached File: {selectedFile.name}</p>}
-                  </Grid>
-                  <Grid item xs={4}> 
-                  </Grid>
-                  <Grid item xs={12}>
-                      <Button
-                      variant="outlined"
-                      color="primary"
-                      onClick={handleSubmit}
-                      style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          transform: 'scale(1)',
-                          transition: 'all 0.3s ease-in-out',
-                          position: 'relative',
-                          borderColor: '#4CAF50',
-                          color: '#4CAF50',
-                      }}
-                      onMouseOver={(e) => {
-                          e.currentTarget.style.backgroundColor = '#4CAF50';
-                          e.currentTarget.style.transform = 'scale(1.1)';
-                          e.currentTarget.style.color = '#ffffff';
-                      }}
-                      onMouseOut={(e) => {
-                          e.currentTarget.style.backgroundColor = 'transparent';
-                          e.currentTarget.style.transform = 'scale(1)';
-                          e.currentTarget.style.color = '#4CAF50';
-                      }}
-                      disabled={loading}
-                      >
-                      {loading ? (
-                          <CircularProgress size={20} style={{ position: 'absolute' }} />
-                      ) : (
-                          <SendIcon style={{ marginRight: '0.5rem' }} />
-                      )}
-                      {loading ? 'Posting...' : 'Post'}
-                      </Button>
-                  </Grid>
-                  </Grid>
-                </div>
-              </div>
-            </div>
-        </Container>
-        </Grid>
-      )}
-      <Grid item xs={12} md={9}>
-        <Container maxWidth="lg" className="p-5">
-        <div className='shadow-lg p-3 mb-5 bg bg-white rounded' >
-        <Paper elevation={0} square sx={{ p: 5 }}>
-        <h4>Jobs you might like</h4>
-        <br/>
-        <TextField
-            type="text"
-            placeholder="Search jobs..."
-            size='small'
-            fullWidth
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            InputProps={{
-              endAdornment: (
-                <InputAdornment position="end">
-                  <IconButton>
-                    <SearchIcon />
-                  </IconButton>
-                </InputAdornment>
-              ),
-            }}
-          />
-            <List>
-              {filteredJobPostings.map((job, index) => (
-                <ListItem
-                  key={index}
-                  button
-                  divider
-                  sx={{
-                    display: 'block',
-                    marginBottom: '10px',
-                    wordWrap: 'break-word',
-                    position: 'relative',
-                    '&:last-child': {
-                      marginBottom: 0,
-                    },
-                  }}
-                  onClick={() => handleOpenModal(job)}
-                >
-                  <ListItemText
-                    primary={<strong>{job.job}</strong>}
-                    secondary={job.skills}
-                    primaryTypographyProps={{ variant: 'h6' }}
-                    secondaryTypographyProps={{ variant: 'subtitle1' }}
-                  />
-                  <ListItemText
-                    primary={job.description}
-                    secondary={`Posted By: ${job.createdBy} ${formatDistanceToNow(new Date(job.createdOn), { addSuffix: true })}`}
-                    primaryTypographyProps={{ variant: 'body1' }}
-                    secondaryTypographyProps={{
-                      variant: 'body2',
-                      color: 'textSecondary',
+                </Grid>
+              </Grid>
+              }
+              {JobactiveTab === 1 && 
+              <Grid container spacing={3} >
+                <Grid item xs={6} md={12}>
+                  <Autocomplete
+                    size='small'
+                    options={[
+                      "Writing & Content",
+                      "Graphic Design & Multimedia",
+                      "Programming & Development",
+                      "Digital Marketing",
+                      "Administrative Support",
+                      "Translation & Languages",
+                      "Sales & Marketing",
+                      "Engineering & Architecture",
+                      "Legal Services",
+                      "Finance & Accounting",
+                      "Data Science & Analytics",
+                      "Video & Animation",
+                      "Music & Audio",
+                      "Consulting & Coaching",
+                      "Healthcare & Wellness"
+                    ]}
+                    renderInput={(params) => <TextField {...params} label="Select Job" />}
+                    value={jobp.job || null}
+                    onChange={(event, value) => {
+                      if (value) {
+                        setjobp((prevJobp) => ({
+                          ...prevJobp,
+                          job: value,
+                          skills: null,
+                        }));
+                      }
                     }}
                   />
-                </ListItem>
-              ))}
-            </List>
-          </Paper>
-        </div>
-        {/* <Dialog open={openModal} onClose={handleCloseModal} maxWidth="lg" fullWidth>
-        {selectedJob && (
-          <>
-            <DialogTitle>{selectedJob.job}</DialogTitle>
-            <DialogContent>
-              <DialogContentText>
-                {selectedJob.description}
-                </DialogContentText>
-                
-                {selectedJob.attachment && (
-                <>
-                  <strong>Attachment:</strong>
-                  <div>Filename: {selectedJob.attachment.filename}</div>
-                  <div>Original Name: {selectedJob.attachment.originalname}</div>
-                  <div>Mimetype: {selectedJob.attachment.mimetype}</div>
-                  <a
-                    href={`/path/to/attachment/${selectedJob.attachment.filename}`}
-                    download
-                  >
-                    Download Attachment
-                  </a>
-                </>
-              )}
-            </DialogContent>
-            <DialogActions>
-              <Button onClick={handleCloseModal}>Close</Button>
-            </DialogActions>
-          </>
-        )}
-      </Dialog> */}
-          {userData.designation === 'Freelancer' && (
-            <Dialog open={openModal} onClose={handleCloseModal} maxWidth="lg" fullWidth>
-            {selectedJob && (
-              <>
-                {/* <DialogTitle>{selectedJob.job}</DialogTitle> */}
-                <DialogContent>
-                  <DialogContentText>
-                    {/* Introduction or overview content can go here */}
-                  </DialogContentText>
-                  
-                  <Grid container spacing={2}>
-                    {/* Left Column */}
-                    <Grid item xs={12} md={6}>
-                      <section>
-                        <h4>{selectedJob.title}</h4>
-                        <br/>
-                        <p>{selectedJob.job}</p>
-                        <p>Posted: {formatDistanceToNow(new Date(selectedJob.createdOn), { addSuffix: true })}</p>
-                      </section>
-                      <Divider />
-                      {/* Section 3: Description */}
-                      <section>
-                        <p>{selectedJob.description}</p>
-                      </section>
-                      <Divider />
-
-                      {/* Section 5: Job Link */}
-                      <section>
-                        <h2>Job Link</h2>
-                        <p>Provide a link to the job posting or related resources.</p>
-                      </section>
-                      <Divider />
-
-                      {/* Section 7: Project Type */}
-                      <section>
-                        <h2>Project Type</h2>
-                        <p>Describe the type of project or work involved.</p>
-                      </section>
-                      <Divider />
-
-                      {/* Section 9: Activity in This Job */}
-                      <section>
-                        <h2>Activity in This Job</h2>
-                        <p>Discuss the ongoing tasks and activity related to the job.</p>
-                      </section>
-                      <Divider />
-
-                    </Grid>
-
-                    {/* Right Column */}
-                    <Grid item xs={12} md={6}>
-                      {/* Section 3: Apply Now */}
-                      <section>
-                        <Grid container spacing={1} textAlign="left">
-                          <Grid item xs={12}>
-                            <Button
-                              variant="contained"
-                              size="small"
-                              color="success"
-                              startIcon={<CheckIcon />}
-                              onClick={() => setOpenDialog(true)}
-                            >
-                              Apply Now
-                            </Button>
-                          </Grid>
-                          <Grid item xs={12}>
-                            <Button variant='outlined' size='small' color='success' startIcon={<BookmarkIcon />}>
-                              Save Job
-                            </Button>
-                          </Grid>
-                          <Grid item xs={12}>
-                            <Button size='small' color='success' startIcon={<FlagIcon />}>
-                              Flag as Inappropriate
-                            </Button>
-                          </Grid>
-                        </Grid>
-                      </section>
-                      <Divider />
-
-                      {/* Section 4: About the Client */}
-                      <section>
-                        <p>Posted By: {selectedJob.createdBy}</p>
-                      </section>
-                      <Divider />
-
-                      {/* Section 6: Flexibility */}
-                      <section>
-                        <h2>Flexibility</h2>
-                        <p>Explain any flexibility options regarding the job.</p>
-                      </section>
-                      <Divider />
-
-                      {/* Section 8: Skills and Expertise */}
-                      <section>
-                        <h2>Skills and Expertise</h2>
-                        <p>List the required skills and expertise for the job.</p>
-                      </section>
-                      <Divider />
-
-                      {/* Section 10: Client History */}
-                      <section>
-                        <h2>Client History</h2>
-                        <p>Provide background information about the client's history.</p>
-                      </section>
-                      <Divider />
-
-                      {/* Section 11: Similar Job */}
-                      <section>
-                        <h2>Similar Job</h2>
-                        <p>Link or describe similar jobs for reference.</p>
-                      </section>
-                      <Divider />
-
-                    </Grid>
-                  </Grid>
-                </DialogContent>
-                <DialogActions>
-                  <Button color='success' size='small'  onClick={handleCloseModal}>Close</Button>
-                </DialogActions>
-              </>
-            )}
-            </Dialog>
-      )}
-          <Dialog open={openDialog} maxWidth="lg" fullWidth>
-            <DialogTitle>Apply for the Job</DialogTitle>
-            <DialogContent>        
-              <Tabs
-                  value={activeTab}
-                  onChange={handleTabChange}
-                  sx={{
-                    "& .Mui-selected": {
-                      color: '#00C853 !important', 
-                    },
-                    "& .MuiTabs-indicator": {
-                      backgroundColor: '#00C853 !important',
-                    },
-                  }}
-                >
-                <Tab label="Proposal Settings" />
-                <Tab label="Job Details" />
-                <Tab label="Additional Details" />
-                <Tab label="Terms" />
-              </Tabs>
-              {/* Content for Proposal Settings Tab */}
-              {activeTab === 0 && (         
-                <Container maxWidth='lg' className='p-3'>
-                  <div className='shadow-lg p-3 mb-5 bg-white rounded'>
-                    <Grid container spacing={2} >
-                      <Grid item xs={12}>
-                          <h5>Profile Settings</h5>
+                </Grid>
+                <Grid item xs={6} md={12}>
+                  {jobp.job && (
+                    <Autocomplete
+                      size='small'
+                      options={jobSkills[jobp.job] || []}
+                      renderInput={(params) => <TextField {...params} label='Skills' variant='outlined' />}
+                      value={jobp.skills || null}
+                      onChange={(event, value) => {
+                        setjobp((prevJobp) => ({
+                          ...prevJobp,
+                          skills: value,
+                        }));
+                      }}
+                      disabled={!jobp.job}
+                    />
+                  )}
+                </Grid>
+              </Grid>
+              }
+              {JobactiveTab === 2 && 
+              <Grid container spacing={3} >
+                <Grid item xs={6} md={12}>
+                  <TextField
+                  label='Description'
+                  multiline
+                  fullWidth
+                  rows={2}
+                  value={jobp.description} name='description' onChange={handleInputs}
+                  />
+                </Grid>
+                <Grid item xs={6} md={12}>
+                        <input
+                          type="file"
+                          accept=".png,.pdf,.doc,.docx"
+                          onChange={handleFileChange}
+                          style={{ visibility: 'hidden', width: '1px' }}
+                          ref={fileInputRef}
+                        />
+                        <Button
+                          variant="outlined"
+                          color="primary"
+                          onClick={() => fileInputRef.current.click()}
+                        >
+                          Attach File
+                        </Button>
+                        {selectedFile && <p>Attached File: {selectedFile.name}</p>}
                       </Grid>
-                      <Grid item xs={12} md={4} >
-                      
-                      <Autocomplete
-                        size='small'
-                        options={workOptions}
-                        renderInput={(params) => <TextField {...params} label="Select Profile" />}
-                        name="profileWork"
-                        value={proposal.profileWork}
-                        onChange={(_, newValue) => {
-                          setProposal((prevUser) => ({
-                            ...prevUser,
-                            profileWork: newValue,
-                          }));
-                      
-                          setSelectedProfile(newValue);
-                          setSelectedHourlyRate(findHourlyRateByWork(newValue));
-                        }}
-                      />  
-                      </Grid>
-                      <Grid item xs={12} md={12} >
-                        <p>This proposal requires <b>16 devCoins</b>.</p>
-                        <p>When you submit this proposal, you'll have <b>96 Coins</b> remaining.</p>
-                      </Grid>
-                    </Grid>
-                    
+              </Grid>
+              }
+              {JobactiveTab === 3 && 
+              <Grid container spacing={3}>
+              <Grid item xs={12} md={6}>
+                <div>
+                  <TextField
+                    label="Pricing"
+                    size='small'
+                    fullWidth
+                    value={ethValue && jobp.pricing}
+                    name="pricing"
+                    onChange={(event) => {
+                      handleEthChange(event);
+                      handleInputs(event);
+                    }}
+                    InputProps={{
+                      inputProps: {
+                        pattern: /^\d*\.?\d*$/,
+                      },
+                    }}
+                  />
+                  <div>
+                    {ethValue && ethToUsdRate !== null && (
+                      <p>
+                        {ethValue} Ethereum is approximately ${calculateUsdValue()} USD
+                      </p>
+                    )}
                   </div>
-                </Container>
-              )}
-
-              {/* Content for Job Details Tab */}
-              {activeTab === 1 && (
-                <Container maxWidth='lg' className='p-3'>
-                  <div className='shadow-lg p-3 mb-5 bg-white rounded'>
-                      {selectedJob && (
-                      <Grid container spacing={2}>
-                        <Grid item xs={12}>
-                          <h5>Job Details</h5>
-                        </Grid>
-                        <Grid item xs={7} md={7} style={{ borderRight: '1px solid #ccc' }}>
-                          <h4>{selectedJob.title}</h4>
-                          <p>{selectedJob.job} Posted On: {formatDistanceToNow(new Date(selectedJob.createdOn), { addSuffix: true })}</p>
-                          <p>{selectedJob.description}</p>
-                        </Grid>
-                        <Grid item xs={5} md={5}>
-                          <p>
-                            <WorkIcon /> {selectedJob.expertise}, Experience Level
-                          </p>
-                          <p>
-                            <EthereumIcon /> Ethereum: {selectedJob.pricing}
-                          </p>
-                          <p>
-                            <AccessTimeIcon /> Time: {selectedJob.estimatedtime}
-                          </p>
-                        </Grid>
-                        
-                        <Grid item xs={12} md={12} style={{ borderTop: '1px solid #ccc' }} >
-                          <p>
-                            Skills & Expertise
-                          </p>
-                          <p>{selectedJob.skills}</p>
-                        </Grid>
-                      </Grid>
-                      
-                        )}
-                  </div>
-              </Container>
-              )}
-
-              {/* Content for Additional Details Tab */}
-              {activeTab === 2 && (
-                  <Container maxWidth='lg' className='p-3'>
-                  <div className='shadow-lg p-3 mb-5 bg-white rounded'>
-                    <Grid container spacing={2} >
-                        <Grid item xs={12} >
-                          <h5>Additional Details</h5>
-                        </Grid>
-                        <Grid item xs={12} md={12} >
-                          <div>
-                            <TextField
-                              variant='outlined'
-                              fullWidth
-                              name='coverLetter'
-                              value={proposal.coverLetter}
-                              onChange={handleInputsProposals}
-                              size='small'
-                              label='Cover Letter'
-                              multiline
-                              rows={4}
-                            />
-                            <Typography variant="body2" color={wordCount < 10 ? 'error' : 'initial'}>
-                              Word Count: {wordCount}
-                            </Typography>
-                            {wordCount < 100 && (
-                              <Typography variant="body2" color="error">
-                                Minimum word count not met (10 words required).
-                              </Typography>
-                            )}
-                          </div>
-                        </Grid>
-                    </Grid>
-                  </div>
-                </Container>
-              )}
-
-              {/* Content for Terms Tab */}
-              {activeTab === 3 && (
-                <Container maxWidth='lg' className='p-3'>
-                <div className='shadow-lg p-3 mb-5 bg-white rounded'>
-                  <Grid container spacing={2}>
-                    <Grid item xs={8} md={8}>
-                      <h5>Terms</h5>
-                      <h6>What is the rate you'd like to bid for this job?</h6>
-                      {selectedProfile && (
-                        <p>Your Profile Rate: {selectedHourlyRate}</p>
-                      )}
-                      <p>Bid Hourly Rate</p>
-                      <TextField
-                        label='Hourly Rate'
-                        size='small'
-                        variant='outlined'
-                        name='hourlyRate'
-                        value={proposal.hourlyRate}
-                        onChange={handleInputsProposals}
-                      />
-                      <p>Client’s budget: {selectedJob.pricing} eth </p>
-                      <p>2% Freelancer Service Fee {selectedJob.pricing * 0.02} eth /hr</p>
-                      <p>You'll receive {selectedJob.pricing - (selectedJob.pricing * 0.02)} eth</p>
-                      <Typography>The estimated amount you'll receive after service fees</Typography>
-                    </Grid>
-                    <Grid item xs={4} md={4} >
-                      <img src={logo} width={250} alt="Logo" />
-                    </Grid>
-                  </Grid>
                 </div>
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <Autocomplete
+                  size='small'
+                  options={[
+                    "Fixed Price",
+                    "Negotiable"
+                  ]}
+                  renderInput={(params) => <TextField {...params} label="Price Flexibility" />}
+                  name="flexibility"
+                  value={jobp.flexibility || null}
+                  onChange={handleAutocompleteChangeflex}
+                />
+              </Grid>
+            </Grid>
+            
+              }
               </Container>
-              )}
             </DialogContent>
             <DialogActions>
-               <Button
-                variant='outlined'
-                size='small'
-                color='success'
-                onClick={() => {
-                  setOpenDialog(false);
-                }}
-              >
-                Cancel
-              </Button>
-              {activeTab > 0 && (
-                <Button variant='outlined' size='small' color='success' onClick={() => setActiveTab(activeTab - 1)}>Back</Button>
+              {JobactiveTab !== 0 && (
+                <IconButton onClick={handleJobBack}>
+                  <ArrowBackIcon />
+                </IconButton>
               )}
-              {activeTab < 3 && (
-                <Button variant='outlined' size='small' color='success' onClick={() => setActiveTab(activeTab + 1)}>Next</Button>
-              )}
-              {activeTab === 3 && (
-                <Button variant='contained' size='small' onClick={Proposal} color='success'>Submit Proposal</Button>
+              {JobactiveTab !== 3 ? (
+                <IconButton onClick={handleJobNext}>
+                  <ArrowForwardIcon />
+                </IconButton>
+              ) : (
+                <Button
+                  variant="outlined"
+                  color="primary"
+                  onClick={handleSubmit}
+                  style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      transform: 'scale(1)',
+                      transition: 'all 0.3s ease-in-out',
+                      position: 'relative',
+                      borderColor: '#4CAF50',
+                      color: '#4CAF50',
+                  }}
+                  onMouseOver={(e) => {
+                      e.currentTarget.style.backgroundColor = '#4CAF50';
+                      e.currentTarget.style.transform = 'scale(1.1)';
+                      e.currentTarget.style.color = '#ffffff';
+                  }}
+                  onMouseOut={(e) => {
+                      e.currentTarget.style.backgroundColor = 'transparent';
+                      e.currentTarget.style.transform = 'scale(1)';
+                      e.currentTarget.style.color = '#4CAF50';
+                  }}
+                  disabled={loading}
+                  >
+                  {loading ? (
+                      <CircularProgress size={20} style={{ position: 'absolute' }} />
+                  ) : (
+                      <SendIcon style={{ marginRight: '0.5rem' }} />
+                  )}
+                  {loading ? 'Posting...' : 'Post'}
+                  </Button>
               )}
             </DialogActions>
           </Dialog>
-        </Container>
-      </Grid>
-      <Grid item xs={12} md={3}>
-      <Container maxWidth='sm' className='p-5'>
-      <div className='shadow-lg p-3 mb-5 bg-white rounded'>
-        <Avatar
-          sx={{
-            width: 100,
-            height: 100,
-            margin: '0 auto',
-            marginBottom: '1rem',
-            border: '2px solid #fff',
-          }}
-        >
-          <PersonIcon fontSize='large' />
-        </Avatar>
-        <div style={{ textAlign: 'center' }}>
-          <h4>{userData.firstname}</h4>
-          <Button color='success' variant="contained" onClick={OnProfile}>Profile</Button>
         </div>
-      </div>
-    </Container>
-      </Grid>   
+        </Container>
+        <Container className='p-5' maxWidth='lg' >
+        <div className='shadow-lg p-3 mb-5 bg bg-white rounded' >
+          <Paper elevation={0} square sx={{ p: 5 }}>
+            <Grid container spacing={0} >
+              <Grid item xs={10} md={10} >
+              <h4>Available Jobs</h4>
+              </Grid>
+            <Grid item xs={2} md={2} >
+              <Button
+                variant="outlined"
+                color="primary"
+                onClick={handleJobOpen}
+                style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    transform: 'scale(1)',
+                    transition: 'all 0.3s ease-in-out',
+                    position: 'relative',
+                    borderColor: '#4CAF50',
+                    color: '#4CAF50',
+                }}
+                onMouseOver={(e) => {
+                    e.currentTarget.style.backgroundColor = '#4CAF50';
+                    e.currentTarget.style.transform = 'scale(1.1)';
+                    e.currentTarget.style.color = '#ffffff';
+                }}
+                onMouseOut={(e) => {
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                    e.currentTarget.style.transform = 'scale(1)';
+                    e.currentTarget.style.color = '#4CAF50';
+                }}
+                disabled={loading}
+                >
+                {loading ? (
+                    <CircularProgress size={20} style={{ position: 'absolute' }} />
+                ) : (
+                    <AddIcon style={{ marginRight: '0.5rem' }} />
+                )}
+                Add a Job
+              </Button>
+            </Grid>
+            </Grid>
+            
+          <br/>
+          <TextField
+              type="text"
+              placeholder="Search jobs..."
+              size='small'
+              fullWidth
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton>
+                      <SearchIcon />
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
+            />
+              <List>
+                {filteredJobPostings.map((job, index) => (
+                  <ListItem
+                    key={index}
+                    button
+                    divider
+                    sx={{
+                      display: 'block',
+                      marginBottom: '10px',
+                      wordWrap: 'break-word',
+                      position: 'relative',
+                      '&:last-child': {
+                        marginBottom: 0,
+                      },
+                    }}
+                    onClick={() => handleOpenModal(job)}
+                  >
+                    <ListItemText
+                      primary={<strong>{job.job}</strong>}
+                      secondary={job.skills}
+                      primaryTypographyProps={{ variant: 'h6' }}
+                      secondaryTypographyProps={{ variant: 'subtitle1' }}
+                    />
+                    <ListItemText
+                      primary={job.description}
+                      secondary={`Posted By: ${job.createdBy} ${formatDistanceToNow(new Date(job.createdOn), { addSuffix: true })}`}
+                      primaryTypographyProps={{ variant: 'body1' }}
+                      secondaryTypographyProps={{
+                        variant: 'body2',
+                        color: 'textSecondary',
+                      }}
+                    />
+                  </ListItem>
+                ))}
+              </List>
+            </Paper>
+        </div>
+        </Container>
+        </Grid>
+      )}
+      {userData.designation === 'Freelancer' && (
+        <>
+          <Grid item xs={12} md={9}>
+          <Container maxWidth="lg" className="p-5">
+          <div className='shadow-lg p-3 mb-5 bg bg-white rounded' >
+          <Paper elevation={0} square sx={{ p: 5 }}>
+          <h4>Jobs you might like</h4>
+          <br/>
+          <TextField
+              type="text"
+              placeholder="Search jobs..."
+              size='small'
+              fullWidth
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton>
+                      <SearchIcon />
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
+            />
+              <List>
+                {filteredJobPostings.map((job, index) => (
+                  <ListItem
+                    key={index}
+                    button
+                    divider
+                    sx={{
+                      display: 'block',
+                      marginBottom: '10px',
+                      wordWrap: 'break-word',
+                      position: 'relative',
+                      '&:last-child': {
+                        marginBottom: 0,
+                      },
+                    }}
+                    onClick={() => handleOpenModal(job)}
+                  >
+                    <ListItemText
+                      primary={<strong>{job.job}</strong>}
+                      secondary={job.skills}
+                      primaryTypographyProps={{ variant: 'h6' }}
+                      secondaryTypographyProps={{ variant: 'subtitle1' }}
+                    />
+                    <ListItemText
+                      primary={job.description}
+                      secondary={`Posted By: ${job.createdBy} ${formatDistanceToNow(new Date(job.createdOn), { addSuffix: true })}`}
+                      primaryTypographyProps={{ variant: 'body1' }}
+                      secondaryTypographyProps={{
+                        variant: 'body2',
+                        color: 'textSecondary',
+                      }}
+                    />
+                  </ListItem>
+                ))}
+              </List>
+            </Paper>
+          </div>
+          {/* <Dialog open={openModal} onClose={handleCloseModal} maxWidth="lg" fullWidth>
+          {selectedJob && (
+            <>
+              <DialogTitle>{selectedJob.job}</DialogTitle>
+              <DialogContent>
+                <DialogContentText>
+                  {selectedJob.description}
+                  </DialogContentText>
+                  
+                  {selectedJob.attachment && (
+                  <>
+                    <strong>Attachment:</strong>
+                    <div>Filename: {selectedJob.attachment.filename}</div>
+                    <div>Original Name: {selectedJob.attachment.originalname}</div>
+                    <div>Mimetype: {selectedJob.attachment.mimetype}</div>
+                    <a
+                      href={`/path/to/attachment/${selectedJob.attachment.filename}`}
+                      download
+                    >
+                      Download Attachment
+                    </a>
+                  </>
+                )}
+              </DialogContent>
+              <DialogActions>
+                <Button onClick={handleCloseModal}>Close</Button>
+              </DialogActions>
+            </>
+          )}
+        </Dialog> */}
+            
+              <Dialog open={openModal} onClose={handleCloseModal} maxWidth="lg" fullWidth>
+              {selectedJob && (
+                <>
+                  {/* <DialogTitle>{selectedJob.job}</DialogTitle> */}
+                  <DialogContent>
+                    <DialogContentText>
+                      {/* Introduction or overview content can go here */}
+                    </DialogContentText>
+                    
+                    <Grid container spacing={2}>
+                      {/* Left Column */}
+                      <Grid item xs={12} md={6}>
+                        <section>
+                          <h4>{selectedJob.title}</h4>
+                          <br/>
+                          <p>{selectedJob.job}</p>
+                          <p>Posted: {formatDistanceToNow(new Date(selectedJob.createdOn), { addSuffix: true })}</p>
+                        </section>
+                        <Divider />
+                        {/* Section 3: Description */}
+                        <section>
+                          <p>{selectedJob.description}</p>
+                        </section>
+                        <Divider />
+
+                        {/* Section 5: Job Link */}
+                        <section>
+                          <h2>Job Link</h2>
+                          <p>Provide a link to the job posting or related resources.</p>
+                        </section>
+                        <Divider />
+
+                        {/* Section 7: Project Type */}
+                        <section>
+                          <h2>Project Type</h2>
+                          <p>Describe the type of project or work involved.</p>
+                        </section>
+                        <Divider />
+
+                        {/* Section 9: Activity in This Job */}
+                        <section>
+                          <h2>Activity in This Job</h2>
+                          <p>Discuss the ongoing tasks and activity related to the job.</p>
+                        </section>
+                        <Divider />
+
+                      </Grid>
+
+                      {/* Right Column */}
+                      <Grid item xs={12} md={6}>
+                        {/* Section 3: Apply Now */}
+                        <section>
+                          <Grid container spacing={1} textAlign="left">
+                            <Grid item xs={12}>
+                              <Button
+                                variant="contained"
+                                size="small"
+                                color="success"
+                                startIcon={<CheckIcon />}
+                                onClick={() => setOpenDialog(true)}
+                              >
+                                Apply Now
+                              </Button>
+                            </Grid>
+                            <Grid item xs={12}>
+                              <Button variant='outlined' size='small' color='success' startIcon={<BookmarkIcon />}>
+                                Save Job
+                              </Button>
+                            </Grid>
+                            <Grid item xs={12}>
+                              <Button size='small' color='success' startIcon={<FlagIcon />}>
+                                Flag as Inappropriate
+                              </Button>
+                            </Grid>
+                          </Grid>
+                        </section>
+                        <Divider />
+
+                        {/* Section 4: About the Client */}
+                        <section>
+                          <p>Posted By: {selectedJob.createdBy}</p>
+                        </section>
+                        <Divider />
+
+                        {/* Section 6: Flexibility */}
+                        <section>
+                          <h2>Flexibility</h2>
+                          <p>Explain any flexibility options regarding the job.</p>
+                        </section>
+                        <Divider />
+
+                        {/* Section 8: Skills and Expertise */}
+                        <section>
+                          <h2>Skills and Expertise</h2>
+                          <p>List the required skills and expertise for the job.</p>
+                        </section>
+                        <Divider />
+
+                        {/* Section 10: Client History */}
+                        <section>
+                          <h2>Client History</h2>
+                          <p>Provide background information about the client's history.</p>
+                        </section>
+                        <Divider />
+
+                        {/* Section 11: Similar Job */}
+                        <section>
+                          <h2>Similar Job</h2>
+                          <p>Link or describe similar jobs for reference.</p>
+                        </section>
+                        <Divider />
+
+                      </Grid>
+                    </Grid>
+                  </DialogContent>
+                  <DialogActions>
+                    <Button color='success' size='small'  onClick={handleCloseModal}>Close</Button>
+                  </DialogActions>
+                </>
+              )}
+              </Dialog>
+            <Dialog open={openDialog} maxWidth="lg" fullWidth>
+              <DialogTitle>Apply for the Job</DialogTitle>
+              <DialogContent>        
+                <Tabs
+                    value={activeTab}
+                    onChange={handleTabChange}
+                    sx={{
+                      "& .Mui-selected": {
+                        color: '#00C853 !important', 
+                      },
+                      "& .MuiTabs-indicator": {
+                        backgroundColor: '#00C853 !important',
+                      },
+                    }}
+                  >
+                  <Tab label="Proposal Settings" />
+                  <Tab label="Job Details" />
+                  <Tab label="Additional Details" />
+                  <Tab label="Terms" />
+                </Tabs>
+                {/* Content for Proposal Settings Tab */}
+                {activeTab === 0 && (         
+                  <Container maxWidth='lg' className='p-3'>
+                    <div className='shadow-lg p-3 mb-5 bg-white rounded'>
+                      <Grid container spacing={2} >
+                        <Grid item xs={12}>
+                            <h5>Profile Settings</h5>
+                        </Grid>
+                        <Grid item xs={12} md={4} >
+                        
+                        <Autocomplete
+                          size='small'
+                          options={workOptions}
+                          renderInput={(params) => <TextField {...params} label="Select Profile" />}
+                          name="profileWork"
+                          value={proposal.profileWork}
+                          onChange={(_, newValue) => {
+                            setProposal((prevUser) => ({
+                              ...prevUser,
+                              profileWork: newValue,
+                            }));
+                        
+                            setSelectedProfile(newValue);
+                            setSelectedHourlyRate(findHourlyRateByWork(newValue));
+                          }}
+                        />  
+                        </Grid>
+                        <Grid item xs={12} md={12} >
+                          <p>This proposal requires <b>16 devCoins</b>.</p>
+                          <p>When you submit this proposal, you'll have <b>96 Coins</b> remaining.</p>
+                        </Grid>
+                      </Grid>
+                      
+                    </div>
+                  </Container>
+                )}
+
+                {/* Content for Job Details Tab */}
+                {activeTab === 1 && (
+                  <Container maxWidth='lg' className='p-3'>
+                    <div className='shadow-lg p-3 mb-5 bg-white rounded'>
+                        {selectedJob && (
+                        <Grid container spacing={2}>
+                          <Grid item xs={12}>
+                            <h5>Job Details</h5>
+                          </Grid>
+                          <Grid item xs={7} md={7} style={{ borderRight: '1px solid #ccc' }}>
+                            <h4>{selectedJob.title}</h4>
+                            <p>{selectedJob.job} Posted On: {formatDistanceToNow(new Date(selectedJob.createdOn), { addSuffix: true })}</p>
+                            <p>{selectedJob.description}</p>
+                          </Grid>
+                          <Grid item xs={5} md={5}>
+                            <p>
+                              <WorkIcon /> {selectedJob.expertise}, Experience Level
+                            </p>
+                            <p>
+                              <EthereumIcon /> Ethereum: {selectedJob.pricing}
+                            </p>
+                            <p>
+                              <AccessTimeIcon /> Time: {selectedJob.estimatedtime}
+                            </p>
+                          </Grid>
+                          
+                          <Grid item xs={12} md={12} style={{ borderTop: '1px solid #ccc' }} >
+                            <p>
+                              Skills & Expertise
+                            </p>
+                            <p>{selectedJob.skills}</p>
+                          </Grid>
+                        </Grid>
+                        
+                          )}
+                    </div>
+                </Container>
+                )}
+
+                {/* Content for Additional Details Tab */}
+                {activeTab === 2 && (
+                    <Container maxWidth='lg' className='p-3'>
+                    <div className='shadow-lg p-3 mb-5 bg-white rounded'>
+                      <Grid container spacing={2} >
+                          <Grid item xs={12} >
+                            <h5>Additional Details</h5>
+                          </Grid>
+                          <Grid item xs={12} md={12} >
+                            <div>
+                              <TextField
+                                variant='outlined'
+                                fullWidth
+                                name='coverLetter'
+                                value={proposal.coverLetter}
+                                onChange={handleInputsProposals}
+                                size='small'
+                                label='Cover Letter'
+                                multiline
+                                rows={4}
+                              />
+                              <Typography variant="body2" color={wordCount < 10 ? 'error' : 'initial'}>
+                                Word Count: {wordCount}
+                              </Typography>
+                              {wordCount < 100 && (
+                                <Typography variant="body2" color="error">
+                                  Minimum word count not met (10 words required).
+                                </Typography>
+                              )}
+                            </div>
+                          </Grid>
+                      </Grid>
+                    </div>
+                  </Container>
+                )}
+
+                {/* Content for Terms Tab */}
+                {activeTab === 3 && (
+                  <Container maxWidth='lg' className='p-3'>
+                  <div className='shadow-lg p-3 mb-5 bg-white rounded'>
+                    <Grid container spacing={2}>
+                      <Grid item xs={8} md={8}>
+                        <h5>Terms</h5>
+                        <h6>What is the rate you'd like to bid for this job?</h6>
+                        {selectedProfile && (
+                          <p>Your Profile Rate: {selectedHourlyRate}</p>
+                        )}
+                        <p>Bid Hourly Rate</p>
+                        <TextField
+                          label='Hourly Rate'
+                          size='small'
+                          variant='outlined'
+                          name='hourlyRate'
+                          value={proposal.hourlyRate}
+                          onChange={handleInputsProposals}
+                        />
+                        <p>Client’s budget: {selectedJob.pricing} eth </p>
+                        <p>2% Freelancer Service Fee {selectedJob.pricing * 0.02} eth /hr</p>
+                        <p>You'll receive {selectedJob.pricing - (selectedJob.pricing * 0.02)} eth</p>
+                        <Typography>The estimated amount you'll receive after service fees</Typography>
+                      </Grid>
+                      <Grid item xs={4} md={4} >
+                        <img src={logo} width={250} alt="Logo" />
+                      </Grid>
+                    </Grid>
+                  </div>
+                </Container>
+                )}
+              </DialogContent>
+              <DialogActions>
+                <Button
+                  variant='outlined'
+                  size='small'
+                  color='success'
+                  onClick={() => {
+                    setOpenDialog(false);
+                  }}
+                >
+                  Cancel
+                </Button>
+                {activeTab > 0 && (
+                  <Button variant='outlined' size='small' color='success' onClick={() => setActiveTab(activeTab - 1)}>Back</Button>
+                )}
+                {activeTab < 3 && (
+                  <Button variant='outlined' size='small' color='success' onClick={() => setActiveTab(activeTab + 1)}>Next</Button>
+                )}
+                {activeTab === 3 && (
+                  <Button variant='contained' size='small' onClick={Proposal} color='success'>Submit Proposal</Button>
+                )}
+              </DialogActions>
+            </Dialog>
+          </Container>
+        </Grid>
+        <Grid item xs={12} md={3}>
+        <Container maxWidth='sm' className='p-5'>
+        <div className='shadow-lg p-3 mb-5 bg-white rounded'>
+          <Avatar
+            sx={{
+              width: 100,
+              height: 100,
+              margin: '0 auto',
+              marginBottom: '1rem',
+              border: '2px solid #fff',
+            }}
+          >
+            <PersonIcon fontSize='large' />
+          </Avatar>
+          <div style={{ textAlign: 'center' }}>
+            <h4>{userData.firstname}</h4>
+            <Button color='success' variant="contained" onClick={OnProfile}>Profile</Button>
+          </div>
+        </div>
+      </Container>
+        </Grid> 
+        </>
+      )}  
     </Grid>
   <ToastContainer/>
     </>
