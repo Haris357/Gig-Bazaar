@@ -27,31 +27,31 @@ const About = () => {
     console.log("Attach button clicked");
   };
   const navigate = useNavigate();
-  const callAboutPage = async ()=>{
-    try {
-      const res = await fetch('/about',{
-        method:"GET",
-        headers: {
-          Accept:"application/json",
-          "Content-Type":"application/json"
-        },
-        credentials:"include"
-      });
-      const data = await res.json();
-      setUserData(data);
-      if(res.status !== 200){
-        const error = new Error(res.error);
-        throw error;
-      }
+  // const callAboutPage = async ()=>{
+  //   try {
+  //     const res = await fetch('/about',{
+  //       method:"GET",
+  //       headers: {
+  //         Accept:"application/json",
+  //         "Content-Type":"application/json"
+  //       },
+  //       credentials:"include"
+  //     });
+  //     const data = await res.json();
+  //     setUserData(data);
+  //     if(res.status !== 200){
+  //       const error = new Error(res.error);
+  //       throw error;
+  //     }
       
-    } catch (error) {
-      console.log(error)
-      navigate('/Login');
-    }
-  }
-  useEffect(() => {
-    callAboutPage();
-  },[])
+  //   } catch (error) {
+  //     console.log(error)
+  //     navigate('/Login');
+  //   }
+  // }
+  // useEffect(() => {
+  //   callAboutPage();
+  // },[])
   
   return (
     <Container maxWidth="md" sx={{ mt: 4 }}>

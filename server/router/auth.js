@@ -4,6 +4,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const authenticate = require('../middleware/authenticate')
 const multer = require('multer');
+
 router.get('/', (req,res) => {
      res.send('Hello World router');
 });
@@ -16,27 +17,9 @@ const DevUser = require("../model/devusersSchema");
 const DevJob = require("../model/devjobpostingschema");
 const DevProps = require("../model/devproposalsSchema");
 const DevProf = require("../model/devuserprofileSchema");
-//Javascript promising
 
-// router.post('/register', async  (req,res) => {
-//      const  {name,email,phone,work,password} = req.body;
-//      if( !name || !email || !phone || !work || !password ){
-//           return res.status(422).json({error: "Parameter Missing"});
-//      }
-//      User.findOne({email:email})
-//           .then((userExist)=>{
-//           if(userExist){
-//                return res.status(422).json({error: "Email Already Exist"});
-//           }
-//           const user = new User({name,email,phone,work,password});
-//           user.save().then(()=>{
-//                res.status(201).json({ message: "User Registered Successfully" });
-//           }).catch((err)=> res.status(500).json({error:"Registration Failed"}))
-//      }).catch((err)=>{console.log(err);})
-//  });
 //Async Await
- //signup
- 
+
  //Registration
  router.post('/signup', async  (req,res) => {
      const  {designation,firstname,lastname,email,password,location} = req.body;
@@ -59,6 +42,7 @@ const DevProf = require("../model/devuserprofileSchema");
           console.log(err);
      }
  });
+
  //Proposals
 router.post('/Proposals', async (req,res) => {
      const {proposalById,profileWork,hourlyRate,coverLetter,proposalOn,jobID,jobByID} = req.body;
@@ -73,6 +57,7 @@ router.post('/Proposals', async (req,res) => {
           console.log(err);
      }
  });
+ 
  //UserProfile
  router.post('/UserProfileWork', async (req,res) => {
      const {work, workHeading, workSpecialization, hourlyRate, workDescription,userID} = req.body;
@@ -213,13 +198,10 @@ router.get('/GetUserProfileWork/:userID', async (req, res) => {
    });
 
  //get about
-     router.get('/about',authenticate,(req,res) => {
+router.get('/about',authenticate,(req,res) => {
      res.send(req.rootUser);
 });
-//get contact && home
-     router.get('/getdata',authenticate,(req,res)=>{
-          res.send(req.rootUser);
-     });
+
 //logout
 router.get('/logout', (req, res) => {
      res.clearCookie('jwtoken', { path: '/' });

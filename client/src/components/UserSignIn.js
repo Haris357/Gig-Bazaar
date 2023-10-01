@@ -55,7 +55,7 @@ const UserSignIn = () => {
     }
     }
     const SignUp = () =>{
-        navigate('/');
+        navigate('/usersignup');
     }
 
   return (

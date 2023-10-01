@@ -110,7 +110,6 @@ const UserSignUp = () => {
         designation: tempSelectedOption,
       }));
       setOpenModal(false);
-      console.log(tempSelectedOption);
     }
   };
   const hidemodal = () =>{
