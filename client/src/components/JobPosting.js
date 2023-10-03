@@ -31,7 +31,8 @@ import CloseIcon from '@mui/icons-material/Close';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import AddIcon from '@mui/icons-material/Add';
-
+import Fab from '@mui/material/Fab';
+import CancelIcon from '@mui/icons-material/Cancel';
 const JobPosting = () => {
 
   const jobSkills = {
@@ -487,7 +488,7 @@ const [ethValue, setEthValue] = useState('');
     if (!data) {
       toast.error('Something went wrong');
     } else {
-      toast.success('User Profile Work Updated Successfully');
+      toast.success('Proposal Submitted SuccessFully');
       setProposal({ ...updatedProfile,profileWork:"",hourlyRate:"",coverLetter:"",proposalOn:"" });
     }
   }
@@ -1110,120 +1111,118 @@ const [ethValue, setEthValue] = useState('');
                 </>
               )}
               </Dialog>
-            <Dialog open={openDialog} maxWidth="lg" fullWidth>
-              <DialogTitle>Apply for the Job</DialogTitle>
-              <DialogContent>        
-                <Tabs
+              <Dialog open={openDialog} maxWidth="lg" fullWidth>
+                <DialogTitle>Apply for the Job</DialogTitle>
+                <DialogContent>
+                  <Tabs
                     value={activeTab}
                     onChange={handleTabChange}
                     sx={{
                       "& .Mui-selected": {
-                        color: '#00C853 !important', 
+                        color: "#00C853 !important",
                       },
                       "& .MuiTabs-indicator": {
-                        backgroundColor: '#00C853 !important',
+                        backgroundColor: "#00C853 !important",
                       },
                     }}
                   >
-                  <Tab label="Proposal Settings" />
-                  <Tab label="Job Details" />
-                  <Tab label="Additional Details" />
-                  <Tab label="Terms" />
-                </Tabs>
-                {/* Content for Proposal Settings Tab */}
-                {activeTab === 0 && (         
-                  <Container maxWidth='lg' className='p-3'>
-                    <div className='shadow-lg p-3 mb-5 bg-white rounded'>
-                      <Grid container spacing={2} >
-                        <Grid item xs={12}>
-                            <h5>Profile Settings</h5>
-                        </Grid>
-                        <Grid item xs={12} md={4} >
-                        
-                        <Autocomplete
-                          size='small'
-                          options={workOptions}
-                          renderInput={(params) => <TextField {...params} label="Select Profile" />}
-                          name="profileWork"
-                          value={proposal.profileWork}
-                          onChange={(_, newValue) => {
-                            setProposal((prevUser) => ({
-                              ...prevUser,
-                              profileWork: newValue,
-                            }));
-                        
-                            setSelectedProfile(newValue);
-                            setSelectedHourlyRate(findHourlyRateByWork(newValue));
-                          }}
-                        />  
-                        </Grid>
-                        <Grid item xs={12} md={12} >
-                          <p>This proposal requires <b>16 devCoins</b>.</p>
-                          <p>When you submit this proposal, you'll have <b>96 Coins</b> remaining.</p>
-                        </Grid>
-                      </Grid>
-                      
-                    </div>
-                  </Container>
-                )}
+                    <Tab label="Proposal Settings" />
+                    <Tab label="Job Details" />
+                    <Tab label="Additional Details" />
+                    <Tab label="Terms" />
+                  </Tabs>
 
-                {/* Content for Job Details Tab */}
-                {activeTab === 1 && (
-                  <Container maxWidth='lg' className='p-3'>
-                    <div className='shadow-lg p-3 mb-5 bg-white rounded'>
-                        {selectedJob && (
+                  {/* Content for Proposal Settings Tab */}
+                  {activeTab === 0 && (
+                    <Container maxWidth="lg" className="p-3">
+                      <div className="shadow-lg p-3 mb-5 bg-white rounded">
                         <Grid container spacing={2}>
                           <Grid item xs={12}>
-                            <h5>Job Details</h5>
+                            <h5>Profile Settings</h5>
                           </Grid>
-                          <Grid item xs={7} md={7} style={{ borderRight: '1px solid #ccc' }}>
-                            <h4>{selectedJob.title}</h4>
-                            <p>{selectedJob.job} Posted On: {formatDistanceToNow(new Date(selectedJob.createdOn), { addSuffix: true })}</p>
-                            <p>{selectedJob.description}</p>
+                          <Grid item xs={12} md={4}>
+                            <Autocomplete
+                              size="small"
+                              options={workOptions}
+                              renderInput={(params) => <TextField {...params} label="Select Profile" />}
+                              name="profileWork"
+                              value={proposal.profileWork}
+                              onChange={(_, newValue) => {
+                                setProposal((prevUser) => ({
+                                  ...prevUser,
+                                  profileWork: newValue,
+                                }));
+
+                                setSelectedProfile(newValue);
+                                setSelectedHourlyRate(findHourlyRateByWork(newValue));
+                              }}
+                            />
                           </Grid>
-                          <Grid item xs={5} md={5}>
-                            <p>
-                              <WorkIcon /> {selectedJob.expertise}, Experience Level
-                            </p>
-                            <p>
-                              <EthereumIcon /> Ethereum: {selectedJob.pricing}
-                            </p>
-                            <p>
-                              <AccessTimeIcon /> Time: {selectedJob.estimatedtime}
-                            </p>
-                          </Grid>
-                          
-                          <Grid item xs={12} md={12} style={{ borderTop: '1px solid #ccc' }} >
-                            <p>
-                              Skills & Expertise
-                            </p>
-                            <p>{selectedJob.skills}</p>
+                          <Grid item xs={12} md={12}>
+                            <p>This proposal requires <b>16 devCoins</b>.</p>
+                            <p>When you submit this proposal, you'll have <b>96 Coins</b> remaining.</p>
                           </Grid>
                         </Grid>
-                        
-                          )}
-                    </div>
-                </Container>
-                )}
+                      </div>
+                    </Container>
+                  )}
 
-                {/* Content for Additional Details Tab */}
-                {activeTab === 2 && (
-                    <Container maxWidth='lg' className='p-3'>
-                    <div className='shadow-lg p-3 mb-5 bg-white rounded'>
-                      <Grid container spacing={2} >
-                          <Grid item xs={12} >
+                  {/* Content for Job Details Tab */}
+                  {activeTab === 1 && (
+                    <Container maxWidth="lg" className="p-3">
+                      <div className="shadow-lg p-3 mb-5 bg-white rounded">
+                        {selectedJob && (
+                          <Grid container spacing={2}>
+                            <Grid item xs={12}>
+                              <h5>Job Details</h5>
+                            </Grid>
+                            <Grid item xs={7} md={7} style={{ borderRight: '1px solid #ccc' }}>
+                              <h4>{selectedJob.title}</h4>
+                              <p>{selectedJob.job} Posted On: {formatDistanceToNow(new Date(selectedJob.createdOn), { addSuffix: true })}</p>
+                              <p>{selectedJob.description}</p>
+                            </Grid>
+                            <Grid item xs={5} md={5}>
+                              <p>
+                                <WorkIcon /> {selectedJob.expertise}, Experience Level
+                              </p>
+                              <p>
+                                <EthereumIcon /> Ethereum: {selectedJob.pricing}
+                              </p>
+                              <p>
+                                <AccessTimeIcon /> Time: {selectedJob.estimatedtime}
+                              </p>
+                            </Grid>
+
+                            <Grid item xs={12} md={12} style={{ borderTop: '1px solid #ccc' }}>
+                              <p>
+                                Skills & Expertise
+                              </p>
+                              <p>{selectedJob.skills}</p>
+                            </Grid>
+                          </Grid>
+                        )}
+                      </div>
+                    </Container>
+                  )}
+
+                  {/* Content for Additional Details Tab */}
+                  {activeTab === 2 && (
+                    <Container maxWidth="lg" className="p-3">
+                      <div className="shadow-lg p-3 mb-5 bg-white rounded">
+                        <Grid container spacing={2}>
+                          <Grid item xs={12}>
                             <h5>Additional Details</h5>
                           </Grid>
-                          <Grid item xs={12} md={12} >
+                          <Grid item xs={12} md={12}>
                             <div>
                               <TextField
-                                variant='outlined'
+                                variant="outlined"
                                 fullWidth
-                                name='coverLetter'
+                                name="coverLetter"
                                 value={proposal.coverLetter}
                                 onChange={handleInputsProposals}
-                                size='small'
-                                label='Cover Letter'
+                                size="small"
+                                label="Cover Letter"
                                 multiline
                                 rows={4}
                               />
@@ -1237,66 +1236,67 @@ const [ethValue, setEthValue] = useState('');
                               )}
                             </div>
                           </Grid>
-                      </Grid>
-                    </div>
-                  </Container>
-                )}
+                        </Grid>
+                      </div>
+                    </Container>
+                  )}
 
-                {/* Content for Terms Tab */}
-                {activeTab === 3 && (
-                  <Container maxWidth='lg' className='p-3'>
-                  <div className='shadow-lg p-3 mb-5 bg-white rounded'>
-                    <Grid container spacing={2}>
-                      <Grid item xs={8} md={8}>
-                        <h5>Terms</h5>
-                        <h6>What is the rate you'd like to bid for this job?</h6>
-                        {selectedProfile && (
-                          <p>Your Profile Rate: {selectedHourlyRate}</p>
-                        )}
-                        <p>Bid Hourly Rate</p>
-                        <TextField
-                          label='Hourly Rate'
-                          size='small'
-                          variant='outlined'
-                          name='hourlyRate'
-                          value={proposal.hourlyRate}
-                          onChange={handleInputsProposals}
-                        />
-                        <p>Client’s budget: {selectedJob.pricing} eth </p>
-                        <p>2% Freelancer Service Fee {selectedJob.pricing * 0.02} eth /hr</p>
-                        <p>You'll receive {selectedJob.pricing - (selectedJob.pricing * 0.02)} eth</p>
-                        <Typography>The estimated amount you'll receive after service fees</Typography>
-                      </Grid>
-                      <Grid item xs={4} md={4} >
-                        <img src={logo} width={250} alt="Logo" />
-                      </Grid>
-                    </Grid>
-                  </div>
-                </Container>
-                )}
-              </DialogContent>
-              <DialogActions>
-                <Button
-                  variant='outlined'
-                  size='small'
-                  color='success'
-                  onClick={() => {
-                    setOpenDialog(false);
-                  }}
-                >
-                  Cancel
-                </Button>
+                  {/* Content for Terms Tab */}
+                  {activeTab === 3 && (
+                    <Container maxWidth="lg" className="p-3">
+                      <div className="shadow-lg p-3 mb-5 bg-white rounded">
+                        <Grid container spacing={2}>
+                          <Grid item xs={8} md={8}>
+                            <h5>Terms</h5>
+                            <h6>What is the rate you'd like to bid for this job?</h6>
+                            {selectedProfile && (
+                              <p>Your Profile Rate: {selectedHourlyRate}</p>
+                            )}
+                            <p>Bid Hourly Rate</p>
+                            <TextField
+                              label="Hourly Rate"
+                              size="small"
+                              variant="outlined"
+                              name="hourlyRate"
+                              value={proposal.hourlyRate}
+                              onChange={handleInputsProposals}
+                            />
+                            <p>Client’s budget: {selectedJob.pricing} eth </p>
+                            <p>2% Freelancer Service Fee {selectedJob.pricing * 0.02} eth /hr</p>
+                            <p>You'll receive {selectedJob.pricing - (selectedJob.pricing * 0.02)} eth</p>
+                            <Typography>The estimated amount you'll receive after service fees</Typography>
+                          </Grid>
+                          <Grid item xs={4} md={4}>
+                            <img src={logo} className="img-fluid" width={250} alt="Logo" />
+                          </Grid>
+                        </Grid>
+                      </div>
+                    </Container>
+                  )}
+                </DialogContent>
+                <DialogActions>
+                  <Fab  size="large" color="error" data-toggle="tooltip" data-placement="top" title="Cancel" onClick={() => setOpenDialog(false)}>
+                    <CancelIcon />
+                  </Fab>
                 {activeTab > 0 && (
-                  <Button variant='outlined' size='small' color='success' onClick={() => setActiveTab(activeTab - 1)}>Back</Button>
+                  <Fab  size="large" color="primary" data-toggle="tooltip" data-placement="top" title="Back" onClick={() => setActiveTab(activeTab - 1)}>
+                    <ArrowBackIcon />
+                  </Fab>
                 )}
                 {activeTab < 3 && (
-                  <Button variant='outlined' size='small' color='success' onClick={() => setActiveTab(activeTab + 1)}>Next</Button>
+                  <Fab  size="large" color="primary" data-toggle="tooltip" data-placement="top" title="Next" onClick={() => setActiveTab(activeTab + 1)}>
+                    <ArrowForwardIcon />
+                  </Fab>
                 )}
                 {activeTab === 3 && (
-                  <Button variant='contained' size='small' onClick={Proposal} color='success'>Submit Proposal</Button>
+                  <Fab variant="extended" size="large" data-toggle="tooltip" data-placement="top" title="Submit Proposal" onClick={Proposal} color="success">
+                    Submit Proposal
+                    <SendIcon style={{marginLeft:'10px'}} />
+                  </Fab>
                 )}
               </DialogActions>
-            </Dialog>
+              </Dialog>
+
           </Container>
         </Grid>
         <Grid item xs={12} md={3}>

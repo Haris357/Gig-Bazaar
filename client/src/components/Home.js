@@ -1,6 +1,6 @@
 import React from 'react';
 import { Button, Container, Divider, Fab, Grid, Typography } from '@mui/material';
-import eth from '../img/crypto-currency.png'
+// import eth from '../img/crypto-currency.png'
 import staff from '../img/staff.png'
 import job from '../img/job-offer.png'
 import quality from '../img/standards.png'
@@ -23,7 +23,7 @@ const Home = () => {
   return (
     <>
      <Container maxWidth='xl' className='p-4' >
-      <div className='shadow-lg p-3 mb-5 bg-white rounded'>
+      {/* <div className='shadow-lg p-3 mb-5 bg-white rounded'>
         <Grid container spacing={1}>
           <Grid item xs={12} md={9}>
             <Typography variant='h4' color='green'><b>Join The Next-Gen Decentralized Talent Marketplace and Shape Your Future Career Today</b></Typography>
@@ -56,7 +56,7 @@ const Home = () => {
               </Button>
               <br />
             <Typography variant='h6' >
-              <b>Explore a world of possibilities on Deverse, where your skills and talents meet a global marketplace. Say goodbye to intermediaries and embrace a decentralized ecosystem that rewards your expertise. Join now and be part of the freelance revolution powered by blockchain technology.
+              <b>Explore a world of possibilities on Gig-Bazaar, where your skills and talents meet a global marketplace. Say goodbye to intermediaries and embrace a decentralized ecosystem that rewards your expertise. Join now and be part of the freelance revolution powered by blockchain technology.
               </b>
             </Typography>
           </Grid>
@@ -64,6 +64,13 @@ const Home = () => {
             <img src={eth} width='100%' alt='Logo' />
           </Grid>
         </Grid>
+      </div> */}
+      <div className='p-3 mb-5' >
+      <div className='text-center title'>
+          <Typography variant='h3' color='green'><b>Gig-Bazaar</b></Typography>
+          <Typography variant='h5' color='green'><b>Unlock Your Gig-tential with Gig-Bazaar</b></Typography>
+          <Typography variant='h6' color='green'><b>Where Freelancers Thrive and Clients Discover Talent in the Web3 Era!</b></Typography>
+      </div>
       </div>
     </Container>
     <Container maxWidth='xl' className='p-4' >
@@ -75,12 +82,12 @@ const Home = () => {
           <Grid item xs={12} md={8} spacing={1} container>
             <Grid item xs={12} md ={12} >
               <Typography variant='h4' color='green'>
-                The best coworkers you've never encountered
+                <b>The best coworkers you've never encountered</b>
               </Typography>
             </Grid>
             <Grid item xs={12} md ={12} >
               <Typography>
-                Innovative logo artisans. Visionary app developers. Customer service aficionados. Expert marketing agencies. When you make the right connection, it can last a lifetime.
+                <b>Innovative logo artisans. Visionary app developers. Customer service aficionados. Expert marketing agencies. When you make the right connection, it can last a lifetime.</b>
               </Typography>
             </Grid>
             <Grid item xs={12} md={6} spacing={1} container>
@@ -347,12 +354,12 @@ const Home = () => {
               <div className='shadow-lg p-3 bg-white rounded'>
                 <Grid container spacing={1} >
                   <Grid item xs={12} md={9} >
-                    <Typography variant='h4' color='green' ><b>Deverse Community</b></Typography>
+                    <Typography variant='h4' color='green' ><b>Gig-Bazaar Community</b></Typography>
                     <Divider/>
                     <br/>
                     <Typography variant='h5' ><b>Fostering Connections in the World of Talent and Opportunity</b></Typography>
                     <br/>
-                    <Typography><b>Welcome to Deverse Community, the vibrant heart of our platform. Here, we bring together freelancers and clients to forge meaningful connections, share expertise, and explore opportunities. Whether you're a talented freelancer seeking your next project or a client looking for the perfect match, our community is your gateway to a world of possibilities. Join us in this dynamic space where recommendations thrive, creativity flourishes, and success knows no bounds. At Deverse, we believe that together, we can achieve greatness.</b></Typography>
+                    <Typography><b>Welcome to Gig-Bazaar Community, the vibrant heart of our platform. Here, we bring together freelancers and clients to forge meaningful connections, share expertise, and explore opportunities. Whether you're a talented freelancer seeking your next project or a client looking for the perfect match, our community is your gateway to a world of possibilities. Join us in this dynamic space where recommendations thrive, creativity flourishes, and success knows no bounds. At Gig-Bazaar, we believe that together, we can achieve greatness.</b></Typography>
                   </Grid>
                   <Grid item xs={12} md={3} >
                     <img src={rating} width='100%' alt='Logo' />

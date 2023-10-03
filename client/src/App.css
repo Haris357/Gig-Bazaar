@@ -252,3 +252,25 @@
   opacity: 1;
   transform: translateY(0);
 }
+/*Fab Animation*/
+.fab-enter {
+  transform: scale(0);
+  opacity: 0;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.fab-enter-active {
+  transform: scale(1);
+  opacity: 1;
+}
+
+.fab-exit {
+  transform: scale(1);
+  opacity: 1;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.fab-exit-active {
+  transform: scale(0);
+  opacity: 0;
+}
