@@ -17,6 +17,7 @@ const DevUser = require("../model/devusersSchema");
 const DevJob = require("../model/devjobpostingschema");
 const DevProps = require("../model/devproposalsSchema");
 const DevProf = require("../model/devuserprofileSchema");
+const DevNoti = require("../model/devnotificationSchema");
 
 //Async Await
 
@@ -43,20 +44,7 @@ const DevProf = require("../model/devuserprofileSchema");
      }
  });
 
- //Proposals
-router.post('/Proposals', async (req,res) => {
-     const {proposalById,profileWork,hourlyRate,coverLetter,proposalOn,jobID,jobByID} = req.body;
-     if( !proposalById || !profileWork  || !hourlyRate || !coverLetter || !proposalOn || !jobByID || !jobID){
-          return res.status(422).json({error: "Please Add Missing Fields"});
-     }
-     try {
-          const props = new DevProps({proposalById,profileWork,hourlyRate,coverLetter,proposalOn,jobID,jobByID});
-          await props.save();
-          res.status(201).json({message: "Proposal Submitted Successfully"});
-     } catch (error) {
-          console.log(err);
-     }
- });
+ 
  
  //UserProfile
  router.post('/UserProfileWork', async (req,res) => {
@@ -208,5 +196,97 @@ router.get('/logout', (req, res) => {
      res.status(200).send('User Logout');
    });
 
+//Proposals
+//Proposals
+router.post('/Proposals', async (req, res) => {
+  const {
+    proposalById,
+    profileWork,
+    hourlyRate,
+    coverLetter,
+    proposalOn,
+    jobID,
+    jobByID,
+  } = req.body;
+
+  if (
+    !proposalById ||
+    !profileWork ||
+    !hourlyRate ||
+    !coverLetter ||
+    !proposalOn ||
+    !jobByID ||
+    !jobID
+  ) {
+    return res.status(422).json({ error: "Please Add Missing Fields" });
+  }
+
+  try {
+    // Check if the user has already sent a proposal for this job
+    const existingProposal = await DevProps.findOne({
+      proposalById,
+      jobID,
+    });
+
+    if (existingProposal) {
+      return res.status(400).json({ error: "You have already sent a proposal for this job" });
+    }
+
+    const props = new DevProps({
+      proposalById,
+      profileWork,
+      hourlyRate,
+      coverLetter,
+      proposalOn,
+      jobID,
+      jobByID,
+    });
+    await props.save();
+
+    const notification = new DevNoti({
+      senderId: proposalById,
+      receiverId: jobByID,
+      jobId: jobID,
+      message: "You have a new proposal for your job.",
+    });
+
+    await notification.save();
+
+    res.status(201).json({ message: "Proposal Submitted Successfully" });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+   //Notifications
+   router.get('/notifications/:userId', authenticate, async (req, res) => {
+    try {
+      const userId = req.params.userId;
+      const notifications = await DevNoti.find({ receiverId: userId })
+        .sort({ createdAt: -1 }) // Newest notifications first
+        .exec();
+  
+      res.status(200).json(notifications);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  });  
+
+router.get('/notifications/count/:userId', authenticate, async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    const notificationCount = await DevNoti.countDocuments({
+      receiverId: userId,
+    });
+
+    res.status(200).json(notificationCount);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
    
+     
 module.exports = router;

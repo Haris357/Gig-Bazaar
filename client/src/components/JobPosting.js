@@ -33,6 +33,7 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import AddIcon from '@mui/icons-material/Add';
 import Fab from '@mui/material/Fab';
 import CancelIcon from '@mui/icons-material/Cancel';
+
 const JobPosting = () => {
 
   const jobSkills = {
@@ -231,7 +232,6 @@ const JobPosting = () => {
   const navigate = useNavigate();
   const [currentDateTime, setCurrentDateTime] = useState(new Date());
   const [userData,setUserData] = useState({});
-  
 
   const UserCall = async () => {
     try {
@@ -469,10 +469,9 @@ const [ethValue, setEthValue] = useState('');
   });
   const Proposal = async (e) => {
     e.preventDefault();
-    console.log(selectedJob)
-    const updatedProfile = { ...proposal, proposalById: userData._id, jobID:selectedJob._id,jobByID:selectedJob.createdByID };
+    const updatedProfile = { ...proposal, proposalById: userData._id, jobID:selectedJob._id, jobByID:selectedJob.createdByID };
   
-    const { profileWork,hourlyRate,coverLetter,proposalOn } = updatedProfile;
+    const { profileWork, hourlyRate, coverLetter, proposalOn } = updatedProfile;
   
     const res = await fetch('/Proposals', {
       method: "POST",
@@ -480,18 +479,22 @@ const [ethValue, setEthValue] = useState('');
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        profileWork,hourlyRate,coverLetter,proposalOn,proposalById:updatedProfile.proposalById,jobID:updatedProfile.jobID,jobByID:updatedProfile.jobByID
+        profileWork, hourlyRate, coverLetter, proposalOn, proposalById: updatedProfile.proposalById, jobID: updatedProfile.jobID, jobByID: updatedProfile.jobByID
       })
     })
   
     const data = await res.json();
     if (!data) {
       toast.error('Something went wrong');
+    } else if (data.error) {
+      toast.error('You have Already Submitted Proposal for this job');
     } else {
-      toast.success('Proposal Submitted SuccessFully');
-      setProposal({ ...updatedProfile,profileWork:"",hourlyRate:"",coverLetter:"",proposalOn:"" });
+      toast.success('Proposal Submitted Successfully');
+      setProposal({ ...updatedProfile, profileWork: "", hourlyRate: "", coverLetter: "", proposalOn: "" });
+      navigate('/JobPosting');
     }
   }
+  
 
   const handleInputsProposals = (event) => {
     const { name, value } = event.target;

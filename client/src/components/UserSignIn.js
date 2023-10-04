@@ -96,7 +96,7 @@ const UserSignIn = () => {
                             </Grid>
                         </Grid>
                         <Grid item xs={12} >
-                            <TextField fullWidth size="small" label="Email" onChange={(e) => setEmail(e.target.value)} variant="outlined" id="email" name='email'/>
+                            <TextField fullWidth size="small" color='success' label="Email" onChange={(e) => setEmail(e.target.value)} variant="outlined" id="email" name='email'/>
                         </Grid>
                         <Grid item xs={12}>
                             <TextField
@@ -104,6 +104,7 @@ const UserSignIn = () => {
                                 size="small"
                                 label="Password"
                                 variant="outlined"
+                                color='success'
                                 type={showPassword ? 'text' : 'password'}
                                 InputProps={{
                                 endAdornment: (

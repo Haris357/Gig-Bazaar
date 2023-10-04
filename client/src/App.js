@@ -16,6 +16,8 @@ import UserSettings from './components/UserSettings';
 import UserNavbar from './components/UserNavbar';
 import UserNavbarRes from './components/UserNavbarRes';
 import Proposals from './components/Proposals.js';
+import NotificationComponent from './components/Notification';
+import Dashboard from './components/Dashboard';
 
 const App = () => {
   const [userData, setUserData] = useState({});
@@ -63,6 +65,8 @@ const App = () => {
       <Route path="/UserProfile" element={<UserProfile />} />
       <Route path="/UserSettings" element={<UserSettings />} />
       <Route path="/Proposals" element={<Proposals />} />
+      <Route path="/Notifications" element={<NotificationComponent />} />
+      <Route path="/Dashboard" element={<Dashboard />} />
     </Routes>
     </>
   )
