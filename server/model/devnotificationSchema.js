@@ -21,6 +21,10 @@ const notificationSchema = new mongoose.Schema({
         type: Date,
         default: Date.now,
       },
+      proposalId:{
+        type:String,
+        required: true,
+      }
   });
 const DevNoti = mongoose.model('DevNoti',notificationSchema);
 

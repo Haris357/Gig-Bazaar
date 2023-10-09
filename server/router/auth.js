@@ -197,7 +197,6 @@ router.get('/logout', (req, res) => {
    });
 
 //Proposals
-//Proposals
 router.post('/Proposals', async (req, res) => {
   const {
     proposalById,
@@ -241,12 +240,14 @@ router.post('/Proposals', async (req, res) => {
       jobID,
       jobByID,
     });
-    await props.save();
+
+    const savedProposal = await props.save(); 
 
     const notification = new DevNoti({
       senderId: proposalById,
       receiverId: jobByID,
       jobId: jobID,
+      proposalId: savedProposal._id,
       message: "You have a new proposal for your job.",
     });
 
@@ -259,20 +260,33 @@ router.post('/Proposals', async (req, res) => {
   }
 });
 
-   //Notifications
-   router.get('/notifications/:userId', authenticate, async (req, res) => {
-    try {
-      const userId = req.params.userId;
-      const notifications = await DevNoti.find({ receiverId: userId })
-        .sort({ createdAt: -1 }) // Newest notifications first
-        .exec();
-  
-      res.status(200).json(notifications);
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ error: 'Internal server error' });
-    }
-  });  
+// Notifications
+router.get('/notifications/:userId', authenticate, async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    const notifications = await DevNoti.find({ receiverId: userId })
+      .sort({ createdAt: -1 })
+      .populate({
+        path: 'jobId',
+        model: 'DevJobs'
+      })
+      .populate({
+        path: 'senderId',
+        model: 'DEVERSEUSER'
+      })
+      .populate({
+        path: 'proposalId',
+        model: 'DevProps'
+      })
+      .exec();
+
+    res.status(200).json(notifications);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 
 router.get('/notifications/count/:userId', authenticate, async (req, res) => {
   try {

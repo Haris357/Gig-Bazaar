@@ -11,7 +11,7 @@ const NotificationComponent = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage] = useState(5);
 
-  const fetchNotifications = async () => {
+  const fetchNotificationsAndData = async () => {
     try {
       if (!userData._id) {
         return;
@@ -24,6 +24,7 @@ const NotificationComponent = () => {
 
       const data = await res.json();
       setNotifications(data);
+      console.log(data);
     } catch (error) {
       console.error(error);
     }
@@ -49,8 +50,10 @@ const NotificationComponent = () => {
       console.log(error);
     }
   };
+
   useEffect(() => {
     UserCall();
+    fetchNotificationsAndData();
   }, []);
 
   const toggleSelectAll = () => {
@@ -74,7 +77,7 @@ const NotificationComponent = () => {
   };
 
   useEffect(() => {
-    fetchNotifications();
+    fetchNotificationsAndData();
   }, [userData._id]);
 
   const startIndex = (currentPage - 1) * rowsPerPage;
@@ -104,18 +107,33 @@ const NotificationComponent = () => {
             .map((notification) => (
               <Grid container spacing={1} key={notification._id}>
                 <Grid item xs={12}>
-                  <Button className="notification-button" fullWidth>
+                <Container maxWidth='xl' sx={{
+                transition: 'background-color 0.3s, transform 0.3s',
+                '&:hover': { 
+                  transform: 'scale(1.02)', 
+                },
+              }}>
+                <div className='shadow-lg bg-white rounded'>
                     <ListItem>
                       <Checkbox
-                        // checked={}
                         onChange={() =>
                           handleCheckboxChange(notification._id)
                         }
                         color="primary"
                       />
-                      <div>{notification.message}</div>
+                      {/* <div>{notification.message}</div> */}
+                      {notification.jobId && (
+                        <div>Job: {notification.jobId.job}</div>
+                      )}
+                      {notification.senderId && (
+                        <div>Sender: {notification.senderId.firstname}</div>
+                      )}
+                      {notification.proposalId && (
+                        <div>Proposal: {notification.proposalId.profileWork}</div>
+                      )}
                     </ListItem>
-                  </Button>
+                  </div>
+              </Container>     
                 </Grid>
               </Grid>
             ))}
