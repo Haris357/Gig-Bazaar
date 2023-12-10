@@ -259,3 +259,17 @@
   transform: translateY(-5px); /* Move the button up slightly on hover */
   transition: background-color 0.3s, transform 0.3s; /* Add a smooth transition */
 }
+
+/* Home css */
+.full-width {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.text-center {
+  text-align: center;
+}
+.full-page-content {
+  margin: 15%;
+}

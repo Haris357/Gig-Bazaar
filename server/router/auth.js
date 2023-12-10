@@ -302,5 +302,20 @@ router.get('/notifications/count/:userId', authenticate, async (req, res) => {
   }
 });
    
+router.get('/dev-profile/:profileWork/:devId', async (req, res) => {
+  const { profileWork, devId } = req.params;
+  try {
+    const decodedProfileWork = decodeURIComponent(profileWork);
+    const profile = await DevProps.findOne({ profileWork: decodedProfileWork, proposalById: devId });
+    if (profile) {
+      res.json(profile);
+    } else {
+      res.status(404).send('Profile not found');
+    }
+  } catch (error) {
+    res.status(500).send('Server Error');
+  }
+});
+
      
 module.exports = router;

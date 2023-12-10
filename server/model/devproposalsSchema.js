@@ -4,7 +4,7 @@ const devproposalsSchema = new mongoose.Schema({
 
     proposalById:{
         type:String,
-        //required:true,
+        required:true,
     },
     profileWork:{
         type:String,

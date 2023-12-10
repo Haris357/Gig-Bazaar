@@ -4,7 +4,7 @@
 import React, { useState,useEffect,useRef } from 'react';
 import Container from '@mui/material/Container';
 import Grid from '@mui/material/Grid';
-import { TextField, TextareaAutosize, Typography } from '@mui/material';
+import { Drawer, TextField, TextareaAutosize, Typography } from '@mui/material';
 import CircularProgress from '@mui/material/CircularProgress';
 import Button from '@mui/material/Button';
 import SendIcon from '@mui/icons-material/Send';
@@ -250,7 +250,7 @@ const JobPosting = () => {
         throw error;
       }
     } catch (error) {
-      console.log(error);
+      navigate('/*');
     }
   }
   
@@ -993,7 +993,7 @@ const [ethValue, setEthValue] = useState('');
           )}
         </Dialog> */}
             
-              <Dialog open={openModal} onClose={handleCloseModal} maxWidth="lg" fullWidth>
+              <Drawer open={openModal} anchor='bottom' onClose={handleCloseModal} maxWidth="lg" fullWidth>
               {selectedJob && (
                 <>
                   {/* <DialogTitle>{selectedJob.job}</DialogTitle> */}
@@ -1113,7 +1113,7 @@ const [ethValue, setEthValue] = useState('');
                   </DialogActions>
                 </>
               )}
-              </Dialog>
+              </Drawer>
               <Dialog open={openDialog} maxWidth="lg" fullWidth>
                 <DialogTitle>Apply for the Job</DialogTitle>
                 <DialogContent>
